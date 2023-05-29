@@ -52,7 +52,7 @@ public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder
         if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH)) {
           decodeAuthSwitchRequest(sequenceId, packet, out);
         } else {
-          out.add(decodeEofResponse(sequenceId, packet, capabilities));
+          out.add(decodeEOFResponse(sequenceId, packet, capabilities));
         }
         break;
       case RESPONSE_ERROR:

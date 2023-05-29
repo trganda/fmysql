@@ -19,13 +19,10 @@ package com.github.trganda.codec;
 public interface Constants {
 
   int NUL_BYTE = 0x00;
-
   int RESPONSE_OK = 0x00;
   int RESPONSE_EOF = 0xfe;
   int RESPONSE_ERROR = 0xff;
-
   int MINIMUM_SUPPORTED_PROTOCOL_VERSION = 10;
-
   int SQL_STATE_SIZE = 6;
 
   // Handshake constants

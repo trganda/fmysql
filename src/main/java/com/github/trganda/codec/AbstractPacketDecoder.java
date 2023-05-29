@@ -25,6 +25,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * An abstract decoder for received mysql protocol packet
+ */
 public abstract class AbstractPacketDecoder extends ByteToMessageDecoder implements Constants {
 
   private final int maxPacketSize;
@@ -35,8 +38,10 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
 
   @Override
   protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    // size of mysql protocol header is 4
     if (in.isReadable(4)) {
       in.markReaderIndex();
+      // payload size, 3 bytes, little endian
       final int packetSize = in.readUnsignedMediumLE();
       if (packetSize > maxPacketSize) {
         throw new TooLongFrameException(
@@ -45,6 +50,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
                 + " but the maximum packet size is "
                 + maxPacketSize);
       }
+      // sequence id
       final int sequenceId = in.readByte();
       if (!in.isReadable(packetSize)) {
         in.resetReaderIndex();
@@ -56,6 +62,13 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
     }
   }
 
+  /**
+   * Decode the payload of mysql packet
+   * @param ctx channel context
+   * @param sequenceId sequence id of packet
+   * @param packet packet payload buffer
+   * @param out output object list
+   */
   protected abstract void decodePacket(
       ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out);
 
@@ -87,7 +100,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
     return builder.build();
   }
 
-  protected EOFResponse decodeEofResponse(
+  protected EOFResponse decodeEOFResponse(
       int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities) {
     if (capabilities.contains(CapabilityFlags.CLIENT_PROTOCOL_41)) {
       return new EOFResponse(

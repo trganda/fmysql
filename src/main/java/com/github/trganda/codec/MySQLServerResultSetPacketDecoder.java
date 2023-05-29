@@ -109,7 +109,7 @@ public class MySQLServerResultSetPacketDecoder extends AbstractPacketDecoder
     final int header = packet.readUnsignedByte();
     if (header == RESPONSE_EOF) {
       state = State.ROW;
-      out.add(decodeEofResponse(sequenceId, packet, capabilities));
+      out.add(decodeEOFResponse(sequenceId, packet, capabilities));
     } else {
       final ColumnDefinition columnDefinition =
           decodeColumnDefinition(sequenceId, packet, header, serverCharset);
@@ -154,7 +154,7 @@ public class MySQLServerResultSetPacketDecoder extends AbstractPacketDecoder
         break;
       case RESPONSE_EOF:
         state = State.COMPLETE;
-        out.add(decodeEofResponse(sequenceId, packet, capabilities));
+        out.add(decodeEOFResponse(sequenceId, packet, capabilities));
         break;
       case RESPONSE_OK:
         state = State.COMPLETE;
