@@ -21,7 +21,7 @@ import io.netty.channel.ChannelHandlerContext;
 /**
  * This packet indicates that an error occurred.
  */
-public class ErrorResponse extends AbstractMySqlPacket implements MysqlServerPacket {
+public class ErrorResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	private final int errorNumber;
 	private final byte[] sqlState;
@@ -47,7 +47,7 @@ public class ErrorResponse extends AbstractMySqlPacket implements MysqlServerPac
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 }

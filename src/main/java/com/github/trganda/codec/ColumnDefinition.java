@@ -21,14 +21,14 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public class ColumnDefinition extends AbstractMySqlPacket implements MysqlServerPacket {
+public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServerPacket {
 	private final String catalog;
 	private final String schema;
 	private final String table;
 	private final String orgTable;
 	private final String name;
 	private final String orgName;
-	private final MysqlCharacterSet characterSet;
+	private final MySQLCharacterSet characterSet;
 	private final long columnLength;
 	private final ColumnType type;
 	private final Set<ColumnFlag> flags = EnumSet.noneOf(ColumnFlag.class);
@@ -77,7 +77,7 @@ public class ColumnDefinition extends AbstractMySqlPacket implements MysqlServer
 		return orgName;
 	}
 
-	public MysqlCharacterSet getCharacterSet() {
+	public MySQLCharacterSet getCharacterSet() {
 		return characterSet;
 	}
 
@@ -106,7 +106,7 @@ public class ColumnDefinition extends AbstractMySqlPacket implements MysqlServer
 		private String orgTable;
 		private String name;
 		private String orgName;
-		private MysqlCharacterSet characterSet = MysqlCharacterSet.UTF8_GENERAL_CI;
+		private MySQLCharacterSet characterSet = MySQLCharacterSet.UTF8_GENERAL_CI;
 		private long columnLength;
 		private ColumnType type;
 		private int decimals;
@@ -146,7 +146,7 @@ public class ColumnDefinition extends AbstractMySqlPacket implements MysqlServer
 			return this;
 		}
 
-		public Builder characterSet(MysqlCharacterSet characterSet) {
+		public Builder characterSet(MySQLCharacterSet characterSet) {
 			this.characterSet = characterSet;
 			return this;
 		}

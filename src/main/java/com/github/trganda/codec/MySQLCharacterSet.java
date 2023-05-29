@@ -21,7 +21,7 @@ import io.netty.util.AttributeKey;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
-public enum MysqlCharacterSet {
+public enum MySQLCharacterSet {
 	BIG5_CHINESE_CI((byte) 1, "Big5"),
 	LATIN2_CZECH_CS((byte) 2, "ISO8859_2"),
 	DEC8_SWEDISH_CI((byte) 3, "ISO8859_1"),
@@ -152,12 +152,12 @@ public enum MysqlCharacterSet {
 	UTF8MB4_UNICODE_CI((byte) 224, "UTF-8"),
 	UTF8MB4_0900_AI_CI((byte) 255, "UTF-8");
 
-	public static final MysqlCharacterSet DEFAULT = UTF8_GENERAL_CI;
+	public static final MySQLCharacterSet DEFAULT = UTF8_GENERAL_CI;
 
 	private byte id;
 	private Charset charset;
 
-	MysqlCharacterSet(byte id, String charsetName) {
+	MySQLCharacterSet(byte id, String charsetName) {
 		this.id = id;
 		try {
 			this.charset = Charset.forName(charsetName);
@@ -166,8 +166,8 @@ public enum MysqlCharacterSet {
 		}
 	}
 
-	public static MysqlCharacterSet findById(int id) {
-		for (MysqlCharacterSet charset : values()) {
+	public static MySQLCharacterSet findById(int id) {
+		for (MySQLCharacterSet charset : values()) {
 			if (charset.id == id) {
 				return charset;
 			}
@@ -183,18 +183,18 @@ public enum MysqlCharacterSet {
 		return id;
 	}
 
-	private static final AttributeKey<MysqlCharacterSet> SERVER_CHARSET_KEY = AttributeKey.newInstance(MysqlCharacterSet.class.getName() + "-server");
-	private static final AttributeKey<MysqlCharacterSet> CLIENT_CHARSET_KEY = AttributeKey.newInstance(MysqlCharacterSet.class.getName() + "-client");
+	private static final AttributeKey<MySQLCharacterSet> SERVER_CHARSET_KEY = AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-server");
+	private static final AttributeKey<MySQLCharacterSet> CLIENT_CHARSET_KEY = AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-client");
 
-	public static MysqlCharacterSet getServerCharsetAttr(Channel channel) {
+	public static MySQLCharacterSet getServerCharsetAttr(Channel channel) {
 		return getCharSetAttr(SERVER_CHARSET_KEY, channel);
 	}
 
-	public static MysqlCharacterSet getClientCharsetAttr(Channel channel) {
+	public static MySQLCharacterSet getClientCharsetAttr(Channel channel) {
 		return getCharSetAttr(CLIENT_CHARSET_KEY, channel);
 	}
 
-	private static MysqlCharacterSet getCharSetAttr(AttributeKey<MysqlCharacterSet> key, Channel channel) {
+	private static MySQLCharacterSet getCharSetAttr(AttributeKey<MySQLCharacterSet> key, Channel channel) {
 		if (channel.hasAttr(key)) {
 			return channel.attr(key).get();
 		}

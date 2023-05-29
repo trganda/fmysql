@@ -16,7 +16,7 @@
 
 package com.github.trganda.codec;
 
-public class ColumnCount extends AbstractMySqlPacket implements MysqlServerPacket {
+public class ColumnCount extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	final int fieldCount;
 

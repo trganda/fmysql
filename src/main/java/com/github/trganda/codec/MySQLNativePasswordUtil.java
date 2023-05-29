@@ -23,7 +23,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Calculates a password hash for {@code mysql_native_password} authentication.
  */
-public class MysqlNativePasswordUtil {
+public class MySQLNativePasswordUtil {
 
 	public static byte[] hashPassword(String password, ByteBuf saltBuf) {
 		byte[] salt = new byte[saltBuf.readableBytes()];

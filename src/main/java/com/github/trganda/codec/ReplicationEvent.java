@@ -23,7 +23,7 @@ public interface ReplicationEvent extends Visitable {
   ReplicationEventPayload payload();
 
   @Override
-  default void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+  default void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
     visitor.visit(this, ctx);
   }
 }

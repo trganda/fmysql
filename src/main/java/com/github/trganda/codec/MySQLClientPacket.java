@@ -16,7 +16,5 @@
 
 package com.github.trganda.codec;
 
-import io.netty.channel.ChannelHandler;
-
-public interface MysqlServerPacketDecoder extends ChannelHandler {
+public interface MySQLClientPacket extends MySQLPacket {
 }

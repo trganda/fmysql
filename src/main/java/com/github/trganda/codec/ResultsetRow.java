@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ResultsetRow extends AbstractMySqlPacket implements MysqlServerPacket {
+public class ResultsetRow extends AbstractMySQLPacket implements MySQLServerPacket {
 	private final List<String> values = new ArrayList<>();
 
 	public ResultsetRow(int sequenceId, String... values) {

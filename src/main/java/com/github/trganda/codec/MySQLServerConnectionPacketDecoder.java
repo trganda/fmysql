@@ -25,13 +25,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 
-public class MysqlServerConnectionPacketDecoder extends AbstractPacketDecoder implements MysqlServerPacketDecoder {
+public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder implements MySQLServerPacketDecoder {
 
-	public MysqlServerConnectionPacketDecoder() {
+	public MySQLServerConnectionPacketDecoder() {
 		this(DEFAULT_MAX_PACKET_SIZE);
 	}
 
-	public MysqlServerConnectionPacketDecoder(int maxPacketSize) {
+	public MySQLServerConnectionPacketDecoder(int maxPacketSize) {
 		super(maxPacketSize);
 	}
 
@@ -39,7 +39,7 @@ public class MysqlServerConnectionPacketDecoder extends AbstractPacketDecoder im
 	protected void decodePacket(ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
 		final Channel channel = ctx.channel();
 		final Set<CapabilityFlags> capabilities = CapabilityFlags.getCapabilitiesAttr(channel);
-		final Charset serverCharset = MysqlCharacterSet.getServerCharsetAttr(channel).getCharset();
+		final Charset serverCharset = MySQLCharacterSet.getServerCharsetAttr(channel).getCharset();
 
 		final int header = packet.readByte() & 0xff;
 		switch (header) {
@@ -85,7 +85,7 @@ public class MysqlServerConnectionPacketDecoder extends AbstractPacketDecoder im
 		builder.addCapabilities(CodecUtils.toEnumSet(CapabilityFlags.class, packet.readUnsignedShortLE()));
 		if (packet.isReadable()) {
 			builder
-					.characterSet(MysqlCharacterSet.findById(packet.readByte()))
+					.characterSet(MySQLCharacterSet.findById(packet.readByte()))
 					.addServerStatus(CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class))
 					.addCapabilities(
 							CodecUtils.toEnumSet(CapabilityFlags.class, packet.readUnsignedShortLE() << Short.SIZE));

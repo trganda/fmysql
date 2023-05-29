@@ -24,18 +24,18 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
-public class MysqlClientConnectionPacketDecoder extends AbstractPacketDecoder implements MysqlClientPacketDecoder {
+public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder implements MySQLClientPacketDecoder {
 
 	// receive AuthSwitchResponse while status is 1, otherwise receive HandshakeResponse
 	private int authSwitchStatus = 0;
 	// keep HandshakeResponse on init handshake
 	private HandshakeResponse handshakeResponse;
 
-	public MysqlClientConnectionPacketDecoder() {
+	public MySQLClientConnectionPacketDecoder() {
 		this(DEFAULT_MAX_PACKET_SIZE);
 	}
 
-	public MysqlClientConnectionPacketDecoder(int maxPacketSize) {
+	public MySQLClientConnectionPacketDecoder(int maxPacketSize) {
 		super(maxPacketSize);
 	}
 
@@ -51,7 +51,7 @@ public class MysqlClientConnectionPacketDecoder extends AbstractPacketDecoder im
 			final HandshakeResponse.Builder builder = HandshakeResponse.create();
 			builder.addCapabilities(clientCapabilities)
 					.maxPacketSize((int) packet.readUnsignedIntLE());
-			final MysqlCharacterSet characterSet = MysqlCharacterSet.findById(packet.readByte());
+			final MySQLCharacterSet characterSet = MySQLCharacterSet.findById(packet.readByte());
 			builder.characterSet(characterSet);
 			packet.skipBytes(23);
 			if (packet.isReadable()) {

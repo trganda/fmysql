@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AsciiString;
 import java.util.*;
 
-public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket {
+public class Handshake extends DefaultByteBufHolder implements MySQLServerPacket {
 
 	public static final int DEFAULT_PROTOCOL_VERSION = 10;
 
@@ -30,7 +30,7 @@ public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket
 	private final AsciiString serverVersion;
 	private final int connectionId;
 	private final Set<CapabilityFlags> capabilities;
-	private final MysqlCharacterSet characterSet;
+	private final MySQLCharacterSet characterSet;
 	private final Set<ServerStatusFlag> serverStatus;
 	private final String authPluginName;
 
@@ -78,7 +78,7 @@ public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket
 		return capabilities;
 	}
 
-	public MysqlCharacterSet getCharacterSet() {
+	public MySQLCharacterSet getCharacterSet() {
 		return characterSet;
 	}
 
@@ -120,7 +120,7 @@ public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket
 		private CharSequence serverVersion;
 		private int connectionId = -1;
 
-		private MysqlCharacterSet characterSet = MysqlCharacterSet.DEFAULT;
+		private MySQLCharacterSet characterSet = MySQLCharacterSet.DEFAULT;
 		private Set<ServerStatusFlag> serverStatus = EnumSet.noneOf(ServerStatusFlag.class);
 		private String authPluginName = Constants.DEFAULT_AUTH_PLUGIN_NAME;
 
@@ -139,8 +139,8 @@ public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket
 			return this;
 		}
 
-		public Builder characterSet(MysqlCharacterSet characterSet) {
-			this.characterSet = characterSet == null ? MysqlCharacterSet.DEFAULT : characterSet;
+		public Builder characterSet(MySQLCharacterSet characterSet) {
+			this.characterSet = characterSet == null ? MySQLCharacterSet.DEFAULT : characterSet;
 			return this;
 		}
 
@@ -170,7 +170,7 @@ public class Handshake extends DefaultByteBufHolder implements MysqlServerPacket
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 }

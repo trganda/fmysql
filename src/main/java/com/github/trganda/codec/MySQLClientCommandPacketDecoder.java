@@ -22,17 +22,17 @@ import io.netty.handler.codec.DecoderException;
 import java.util.List;
 import java.util.Optional;
 
-public class MysqlClientCommandPacketDecoder extends AbstractPacketDecoder implements MysqlClientPacketDecoder {
+public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder implements MySQLClientPacketDecoder {
 
 	private final String database;
 	private final String userName;
 	private final byte[] scramble411;
 
-	public MysqlClientCommandPacketDecoder(String database, String userName, byte[] scramble411) {
+	public MySQLClientCommandPacketDecoder(String database, String userName, byte[] scramble411) {
 		this(Constants.DEFAULT_MAX_PACKET_SIZE, database, userName, scramble411);
 	}
 
-	public MysqlClientCommandPacketDecoder(int maxPacketSize, String database, String userName, byte[] scramble411) {
+	public MySQLClientCommandPacketDecoder(int maxPacketSize, String database, String userName, byte[] scramble411) {
 		super(maxPacketSize);
 
 		this.database = database;
@@ -42,7 +42,7 @@ public class MysqlClientCommandPacketDecoder extends AbstractPacketDecoder imple
 
 	@Override
 	protected void decodePacket(ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
-		final MysqlCharacterSet clientCharset = MysqlCharacterSet.getClientCharsetAttr(ctx.channel());
+		final MySQLCharacterSet clientCharset = MySQLCharacterSet.getClientCharsetAttr(ctx.channel());
 
 		final byte commandCode = packet.readByte();
 		final Optional<Command> command = Command.findByCommandCode(commandCode);

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class MysqlServerResultSetPacketDecoder extends AbstractPacketDecoder implements MysqlServerPacketDecoder {
+public class MySQLServerResultSetPacketDecoder extends AbstractPacketDecoder implements MySQLServerPacketDecoder {
 
 	enum State {
 		COLUMN_COUNT,
@@ -37,11 +37,11 @@ public class MysqlServerResultSetPacketDecoder extends AbstractPacketDecoder imp
 	private State state = State.COLUMN_COUNT;
 	private List<ColumnDefinition> columnDefinitions;
 
-	public MysqlServerResultSetPacketDecoder() {
+	public MySQLServerResultSetPacketDecoder() {
 		this(DEFAULT_MAX_PACKET_SIZE);
 	}
 
-	public MysqlServerResultSetPacketDecoder(int maxPacketSize) {
+	public MySQLServerResultSetPacketDecoder(int maxPacketSize) {
 		super(maxPacketSize);
 	}
 
@@ -49,7 +49,7 @@ public class MysqlServerResultSetPacketDecoder extends AbstractPacketDecoder imp
 	protected void decodePacket(ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
 		final Channel channel = ctx.channel();
 		final Set<CapabilityFlags> capabilities = CapabilityFlags.getCapabilitiesAttr(channel);
-		final Charset serverCharset = MysqlCharacterSet.getServerCharsetAttr(channel).getCharset();
+		final Charset serverCharset = MySQLCharacterSet.getServerCharsetAttr(channel).getCharset();
 
 		switch (state) {
 			case COLUMN_COUNT:
@@ -116,7 +116,7 @@ public class MysqlServerResultSetPacketDecoder extends AbstractPacketDecoder imp
 				.name(CodecUtils.readLengthEncodedString(packet, serverCharset))
 				.orgName(CodecUtils.readLengthEncodedString(packet, serverCharset));
 		packet.readByte();
-		builder.characterSet(MysqlCharacterSet.findById(packet.readShortLE()))
+		builder.characterSet(MySQLCharacterSet.findById(packet.readShortLE()))
 				.columnLength(packet.readUnsignedIntLE())
 				.type(ColumnType.lookup(packet.readUnsignedByte()))
 				.addFlags(CodecUtils.readShortEnumSet(packet, ColumnFlag.class))

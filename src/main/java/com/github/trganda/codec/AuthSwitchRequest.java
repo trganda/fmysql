@@ -18,7 +18,7 @@ package com.github.trganda.codec;
 
 import io.netty.channel.ChannelHandlerContext;
 
-public class AuthSwitchRequest extends AbstractMySqlPacket implements MysqlServerPacket {
+public class AuthSwitchRequest extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	private final byte[] salt;
 	private final String authPluginName;
@@ -30,7 +30,7 @@ public class AuthSwitchRequest extends AbstractMySqlPacket implements MysqlServe
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 

@@ -19,7 +19,7 @@ package com.github.trganda.codec;
 /**
  *
  */
-public class CommandPacket extends AbstractMySqlPacket implements MysqlClientPacket {
+public class CommandPacket extends AbstractMySQLPacket implements MySQLClientPacket {
 
 	private final Command command;
 

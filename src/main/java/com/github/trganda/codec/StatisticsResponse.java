@@ -18,7 +18,7 @@ package com.github.trganda.codec;
 
 import io.netty.channel.ChannelHandlerContext;
 
-public class StatisticsResponse extends AbstractMySqlPacket implements MysqlServerPacket {
+public class StatisticsResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	private final String statString;
 
@@ -28,7 +28,7 @@ public class StatisticsResponse extends AbstractMySqlPacket implements MysqlServ
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 

@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public class EofResponse extends AbstractMySqlPacket implements MysqlServerPacket {
+public class EofResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	private final int warnings;
 	private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
@@ -48,7 +48,7 @@ public class EofResponse extends AbstractMySqlPacket implements MysqlServerPacke
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 

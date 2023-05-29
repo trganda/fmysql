@@ -21,11 +21,11 @@ import io.netty.channel.ChannelHandlerContext;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-public class MysqlClientPacketEncoder extends AbstractPacketEncoder<MysqlClientPacket> {
+public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientPacket> {
 
 	@Override
-	protected void encodePacket(ChannelHandlerContext ctx, MysqlClientPacket packet, ByteBuf buf) throws Exception {
-		final Charset charset = MysqlCharacterSet.getClientCharsetAttr(ctx.channel()).getCharset();
+	protected void encodePacket(ChannelHandlerContext ctx, MySQLClientPacket packet, ByteBuf buf) throws Exception {
+		final Charset charset = MySQLCharacterSet.getClientCharsetAttr(ctx.channel()).getCharset();
 		final Set<CapabilityFlags> capabilities = CapabilityFlags.getCapabilitiesAttr(ctx.channel());
 		if (packet instanceof CommandPacket) {
 			encodeCommandPacket((CommandPacket) packet, buf, charset);

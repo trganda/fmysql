@@ -23,12 +23,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
-public class MysqlServerPacketEncoder extends AbstractPacketEncoder<MysqlServerPacket> {
+public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerPacket> {
 
 	@Override
-	protected void encodePacket(ChannelHandlerContext ctx, MysqlServerPacket packet, ByteBuf buf) {
+	protected void encodePacket(ChannelHandlerContext ctx, MySQLServerPacket packet, ByteBuf buf) {
 		final EnumSet<CapabilityFlags> capabilities = CapabilityFlags.getCapabilitiesAttr(ctx.channel());
-		final Charset serverCharset = MysqlCharacterSet.getServerCharsetAttr(ctx.channel()).getCharset();
+		final Charset serverCharset = MySQLCharacterSet.getServerCharsetAttr(ctx.channel()).getCharset();
 		if (packet instanceof ColumnCount) {
 			encodeColumnCount((ColumnCount) packet, buf);
 		} else if (packet instanceof ColumnDefinition) {

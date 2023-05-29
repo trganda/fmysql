@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public class OkResponse extends AbstractMySqlPacket implements MysqlServerPacket {
+public class OkResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
 	private final long affectedRows;
 	private final long lastInsertId;
@@ -134,7 +134,7 @@ public class OkResponse extends AbstractMySqlPacket implements MysqlServerPacket
 	}
 
 	@Override
-	public void accept(MysqlServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
 		visitor.visit(this, ctx);
 	}
 }

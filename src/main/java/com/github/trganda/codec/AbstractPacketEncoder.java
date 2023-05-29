@@ -20,7 +20,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public abstract class AbstractPacketEncoder<T extends MysqlPacket> extends MessageToByteEncoder<T> {
+public abstract class AbstractPacketEncoder<T extends MySQLPacket> extends MessageToByteEncoder<T> {
 
 	@Override
 	final protected void encode(ChannelHandlerContext ctx, T packet, ByteBuf buf) throws Exception {

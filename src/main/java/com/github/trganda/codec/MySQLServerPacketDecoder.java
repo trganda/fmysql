@@ -16,16 +16,7 @@
 
 package com.github.trganda.codec;
 
-abstract class AbstractMySqlPacket implements MysqlPacket {
+import io.netty.channel.ChannelHandler;
 
-	private final int sequenceId;
-
-	public AbstractMySqlPacket(int sequenceId) {
-		this.sequenceId = sequenceId;
-	}
-
-	@Override
-	public int getSequenceId() {
-		return sequenceId;
-	}
+public interface MySQLServerPacketDecoder extends ChannelHandler {
 }

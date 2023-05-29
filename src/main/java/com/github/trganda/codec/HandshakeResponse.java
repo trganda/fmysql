@@ -20,11 +20,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.DefaultByteBufHolder;
 import java.util.*;
 
-public class HandshakeResponse extends DefaultByteBufHolder implements MysqlClientPacket {
+public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClientPacket {
 
 	private final Set<CapabilityFlags> capabilityFlags = EnumSet.noneOf(CapabilityFlags.class);
 	private final int maxPacketSize;
-	private final MysqlCharacterSet characterSet;
+	private final MySQLCharacterSet characterSet;
 	private final String username;
 	private final String database;
 	private String authPluginName;
@@ -47,7 +47,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MysqlClie
 	}
 
 	public static HandshakeResponse createSslResponse(Set<CapabilityFlags> capabilities, int maxPacketSize,
-                                                      MysqlCharacterSet characterSet) {
+                                                      MySQLCharacterSet characterSet) {
 		return create()
 				.maxPacketSize(maxPacketSize)
 				.characterSet(characterSet)
@@ -68,7 +68,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MysqlClie
 		return maxPacketSize;
 	}
 
-	public MysqlCharacterSet getCharacterSet() {
+	public MySQLCharacterSet getCharacterSet() {
 		return characterSet;
 	}
 
@@ -103,7 +103,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MysqlClie
 
 	public static class Builder extends AbstractAuthPluginDataBuilder<Builder> {
 		private int maxPacketSize = Constants.DEFAULT_MAX_PACKET_SIZE;
-		private MysqlCharacterSet characterSet = MysqlCharacterSet.DEFAULT;
+		private MySQLCharacterSet characterSet = MySQLCharacterSet.DEFAULT;
 		private String username;
 		private String database;
 		private String authPluginName;
@@ -114,7 +114,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MysqlClie
 			return this;
 		}
 
-		public Builder characterSet(MysqlCharacterSet characterSet) {
+		public Builder characterSet(MySQLCharacterSet characterSet) {
 			Objects.requireNonNull(characterSet, "characterSet can NOT be null");
 			this.characterSet = characterSet;
 			return this;
