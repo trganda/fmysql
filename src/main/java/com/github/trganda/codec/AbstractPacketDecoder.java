@@ -58,7 +58,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
       }
       final ByteBuf packet = in.readSlice(packetSize);
 
-      decodePacket(ctx, sequenceId, packet, out);
+      decodePayload(ctx, sequenceId, packet, out);
     }
   }
 
@@ -69,7 +69,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
    * @param packet packet payload buffer
    * @param out output object list
    */
-  protected abstract void decodePacket(
+  protected abstract void decodePayload(
       ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out);
 
   protected OkResponse decodeOkResponse(
