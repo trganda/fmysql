@@ -35,8 +35,8 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
       encodeColumnCount((ColumnCount) packet, buf);
     } else if (packet instanceof ColumnDefinition) {
       encodeColumnDefinition(serverCharset, (ColumnDefinition) packet, buf);
-    } else if (packet instanceof EofResponse) {
-      encodeEofResponse(capabilities, (EofResponse) packet, buf);
+    } else if (packet instanceof EOFResponse) {
+      encodeEofResponse(capabilities, (EOFResponse) packet, buf);
     } else if (packet instanceof Handshake) {
       encodeHandshake((Handshake) packet, buf);
     } else if (packet instanceof AuthSwitchRequest) {
@@ -79,7 +79,7 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
   }
 
   protected void encodeEofResponse(
-      EnumSet<CapabilityFlags> capabilities, EofResponse eof, ByteBuf buf) {
+			EnumSet<CapabilityFlags> capabilities, EOFResponse eof, ByteBuf buf) {
     buf.writeByte(0xfe);
     if (capabilities.contains(CapabilityFlags.CLIENT_PROTOCOL_41)) {
       buf.writeShortLE(eof.getWarnings())

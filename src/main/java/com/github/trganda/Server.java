@@ -151,7 +151,7 @@ public class Server implements AutoCloseable {
           } else if (command.equals(Command.COM_INIT_DB) || command.equals(Command.COM_PING)) {
             ctx.writeAndFlush(OkResponse.builder().sequenceId(sequenceId + 1).build());
           } else if (command.equals(Command.COM_FIELD_LIST)) {
-            ctx.writeAndFlush(new EofResponse(sequenceId + 1, 0));
+            ctx.writeAndFlush(new EOFResponse(sequenceId + 1, 0));
           } else if (command.equals(Command.COM_STATISTICS)) {
             String statString =
                 "Uptime: "
@@ -278,8 +278,8 @@ public class Server implements AutoCloseable {
                 .addFlags(ColumnFlag.NUM)
                 .decimals(5)
                 .build());
-        ctx.write(new EofResponse(++sequenceId[0], 0));
-        ctx.writeAndFlush(new EofResponse(++sequenceId[0], 0));
+        ctx.write(new EOFResponse(++sequenceId[0], 0));
+        ctx.writeAndFlush(new EOFResponse(++sequenceId[0], 0));
       }
       logger.info("[mysql-protocol] Query done");
     }
@@ -509,9 +509,9 @@ public class Server implements AutoCloseable {
     for (ColumnDefinition columnDefinition : columnDefinitions) {
       ctx.write(columnDefinition);
     }
-    ctx.write(new EofResponse(++sequenceId, 0));
+    ctx.write(new EOFResponse(++sequenceId, 0));
     ctx.write(new ResultsetRow(++sequenceId, values.toArray(new String[values.size()])));
-    ctx.writeAndFlush(new EofResponse(++sequenceId, 0));
+    ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
   }
 
   private ColumnDefinition newColumnDefinition(

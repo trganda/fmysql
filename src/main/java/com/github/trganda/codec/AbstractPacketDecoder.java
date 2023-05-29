@@ -87,15 +87,15 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
     return builder.build();
   }
 
-  protected EofResponse decodeEofResponse(
+  protected EOFResponse decodeEofResponse(
       int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities) {
     if (capabilities.contains(CapabilityFlags.CLIENT_PROTOCOL_41)) {
-      return new EofResponse(
+      return new EOFResponse(
           sequenceId,
           packet.readUnsignedShortLE(),
           CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class));
     } else {
-      return new EofResponse(sequenceId, 0);
+      return new EOFResponse(sequenceId, 0);
     }
   }
 

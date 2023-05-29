@@ -22,18 +22,18 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public class EofResponse extends AbstractMySQLPacket implements MySQLServerPacket {
+public class EOFResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
   private final int warnings;
   private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
 
-  public EofResponse(int sequenceId, int warnings, ServerStatusFlag... flags) {
+  public EOFResponse(int sequenceId, int warnings, ServerStatusFlag... flags) {
     super(sequenceId);
     this.warnings = warnings;
     Collections.addAll(statusFlags, flags);
   }
 
-  public EofResponse(int sequenceId, int warnings, Collection<ServerStatusFlag> flags) {
+  public EOFResponse(int sequenceId, int warnings, Collection<ServerStatusFlag> flags) {
     super(sequenceId);
     this.warnings = warnings;
     statusFlags.addAll(flags);

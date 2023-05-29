@@ -82,7 +82,7 @@ public class OkResponse extends AbstractMySQLPacket implements MySQLServerPacket
     private int warnings;
     private String info;
 
-    private Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
+    private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
     private String sessionStateChanges;
 
     public Builder sequenceId(int sequenceId) {

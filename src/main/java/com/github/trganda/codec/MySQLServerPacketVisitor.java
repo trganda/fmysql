@@ -23,7 +23,7 @@ public interface MySQLServerPacketVisitor {
 
   void visit(OkResponse ok, ChannelHandlerContext ctx);
 
-  void visit(EofResponse eof, ChannelHandlerContext ctx);
+  void visit(EOFResponse eof, ChannelHandlerContext ctx);
 
   void visit(AuthSwitchRequest swi, ChannelHandlerContext ctx);
 
