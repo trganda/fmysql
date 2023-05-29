@@ -27,6 +27,7 @@ public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
   @Override
   protected void decodePayload(
       ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
+    // if status is 0, need to processing login request from mysql client
     if (authSwitchStatus == 0) {
       final EnumSet<CapabilityFlags> clientCapabilities =
           CodecUtils.readIntEnumSet(packet, CapabilityFlags.class);
@@ -37,10 +38,13 @@ public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
 
       final HandshakeResponse.Builder builder = HandshakeResponse.create();
       builder.addCapabilities(clientCapabilities).maxPacketSize((int) packet.readUnsignedIntLE());
+
       final MySQLCharacterSet characterSet = MySQLCharacterSet.findById(packet.readByte());
       builder.characterSet(characterSet);
       packet.skipBytes(23);
+
       if (packet.isReadable()) {
+        // username
         builder.username(CodecUtils.readNullTerminatedString(packet, characterSet.getCharset()));
 
         final EnumSet<CapabilityFlags> serverCapabilities =
@@ -56,13 +60,16 @@ public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
         } else {
           authResponseLength = CodecUtils.findNullTermLen(packet);
         }
+        // password
         builder.addAuthData(packet, authResponseLength);
 
         if (capabilities.contains(CapabilityFlags.CLIENT_CONNECT_WITH_DB)) {
+          // database name
           builder.database(CodecUtils.readNullTerminatedString(packet, characterSet.getCharset()));
         }
 
         if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH)) {
+          // auth plugin name
           builder.authPluginName(
               CodecUtils.readNullTerminatedString(packet, StandardCharsets.UTF_8));
         }

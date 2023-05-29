@@ -9,9 +9,17 @@ import java.util.Optional;
 public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
     implements MySQLClientPacketDecoder {
 
-  private final String database;
-  private final String userName;
-  private final byte[] scramble411;
+  private String database;
+  private String userName;
+  private byte[] scramble411;
+
+  public MySQLClientCommandPacketDecoder() {
+    this(Constants.DEFAULT_MAX_PACKET_SIZE);
+  }
+
+  public MySQLClientCommandPacketDecoder(int maxPacketSize) {
+    super(maxPacketSize);
+  }
 
   public MySQLClientCommandPacketDecoder(String database, String userName, byte[] scramble411) {
     this(Constants.DEFAULT_MAX_PACKET_SIZE, database, userName, scramble411);
@@ -37,6 +45,7 @@ public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
       throw new DecoderException("Unknown command " + commandCode);
     }
     switch (command.get()) {
+      // currently only support COM_QUERY
       case COM_QUERY:
         out.add(
             new QueryCommand(

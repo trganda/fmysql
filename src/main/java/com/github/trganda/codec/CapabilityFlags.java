@@ -69,6 +69,11 @@ public enum CapabilityFlags {
     return attr.get();
   }
 
+  /**
+   * Set the capabilities attributes of current channel as context.
+   * @param channel the channel of current connection
+   * @param capabilities the capabilities of mysql client or server
+   */
   public static void setCapabilitiesAttr(Channel channel, Set<CapabilityFlags> capabilities) {
     final Attribute<EnumSet<CapabilityFlags>> attr = channel.attr(capabilitiesKey);
     attr.set(EnumSet.copyOf(capabilities));
