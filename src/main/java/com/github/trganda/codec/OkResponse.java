@@ -24,117 +24,115 @@ import java.util.Set;
 
 public class OkResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
-	private final long affectedRows;
-	private final long lastInsertId;
+  private final long affectedRows;
+  private final long lastInsertId;
 
-	private final int warnings;
-	private final String info;
+  private final int warnings;
+  private final String info;
 
-	private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
-	private final String sessionStateChanges;
+  private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
+  private final String sessionStateChanges;
 
+  public OkResponse(Builder builder) {
+    super(builder.sequenceId);
+    affectedRows = builder.affectedRows;
+    lastInsertId = builder.lastInsertId;
 
-	public OkResponse(Builder builder) {
-		super(builder.sequenceId);
-		affectedRows = builder.affectedRows;
-		lastInsertId = builder.lastInsertId;
+    warnings = builder.warnings;
+    info = builder.info;
 
-		warnings = builder.warnings;
-		info = builder.info;
+    statusFlags.addAll(builder.statusFlags);
+    sessionStateChanges = builder.sessionStateChanges;
+  }
 
-		statusFlags.addAll(builder.statusFlags);
-		sessionStateChanges = builder.sessionStateChanges;
-	}
+  public long getAffectedRows() {
+    return affectedRows;
+  }
 
-	public long getAffectedRows() {
-		return affectedRows;
-	}
+  public long getLastInsertId() {
+    return lastInsertId;
+  }
 
-	public long getLastInsertId() {
-		return lastInsertId;
-	}
+  public int getWarnings() {
+    return warnings;
+  }
 
-	public int getWarnings() {
-		return warnings;
-	}
+  public String getInfo() {
+    return info;
+  }
 
-	public String getInfo() {
-		return info;
-	}
+  public Set<ServerStatusFlag> getStatusFlags() {
+    return EnumSet.copyOf(statusFlags);
+  }
 
-	public Set<ServerStatusFlag> getStatusFlags() {
-		return EnumSet.copyOf(statusFlags);
-	}
+  public String getSessionStateChanges() {
+    return sessionStateChanges;
+  }
 
-	public String getSessionStateChanges() {
-		return sessionStateChanges;
-	}
+  public static Builder builder() {
+    return new Builder();
+  }
 
-	public static Builder builder() {
-		return new Builder();
-	}
+  public static class Builder {
+    private int sequenceId;
 
+    private long affectedRows;
+    private long lastInsertId;
 
-	public static class Builder {
-		private int sequenceId;
+    private int warnings;
+    private String info;
 
-		private long affectedRows;
-		private long lastInsertId;
+    private Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
+    private String sessionStateChanges;
 
-		private int warnings;
-		private String info;
+    public Builder sequenceId(int sequenceId) {
+      this.sequenceId = sequenceId;
+      return this;
+    }
 
-		private Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
-		private String sessionStateChanges;
+    public Builder affectedRows(long affectedRows) {
+      this.affectedRows = affectedRows;
+      return this;
+    }
 
-		public Builder sequenceId(int sequenceId) {
-			this.sequenceId = sequenceId;
-			return this;
-		}
+    public Builder lastInsertId(long lastInsertId) {
+      this.lastInsertId = lastInsertId;
+      return this;
+    }
 
-		public Builder affectedRows(long affectedRows) {
-			this.affectedRows = affectedRows;
-			return this;
-		}
+    public Builder addStatusFlags(ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
+      this.statusFlags.add(statusFlag);
+      Collections.addAll(this.statusFlags, statusFlags);
+      return this;
+    }
 
-		public Builder lastInsertId(long lastInsertId) {
-			this.lastInsertId = lastInsertId;
-			return this;
-		}
+    public Builder addStatusFlags(Collection<ServerStatusFlag> statusFlags) {
+      this.statusFlags.addAll(statusFlags);
+      return this;
+    }
 
-		public Builder addStatusFlags(ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
-			this.statusFlags.add(statusFlag);
-			Collections.addAll(this.statusFlags, statusFlags);
-			return this;
-		}
+    public Builder warnings(int warnings) {
+      this.warnings = warnings;
+      return this;
+    }
 
-		public Builder addStatusFlags(Collection<ServerStatusFlag> statusFlags) {
-			this.statusFlags.addAll(statusFlags);
-			return this;
-		}
+    public Builder info(String info) {
+      this.info = info;
+      return this;
+    }
 
-		public Builder warnings(int warnings) {
-			this.warnings = warnings;
-			return this;
-		}
+    public Builder sessionStateChanges(String sessionStateChanges) {
+      this.sessionStateChanges = sessionStateChanges;
+      return this;
+    }
 
-		public Builder info(String info) {
-			this.info = info;
-			return this;
-		}
+    public OkResponse build() {
+      return new OkResponse(this);
+    }
+  }
 
-		public Builder sessionStateChanges(String sessionStateChanges) {
-			this.sessionStateChanges = sessionStateChanges;
-			return this;
-		}
-
-		public OkResponse build() {
-			return new OkResponse(this);
-		}
-	}
-
-	@Override
-	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
-		visitor.visit(this, ctx);
-	}
+  @Override
+  public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+    visitor.visit(this, ctx);
+  }
 }

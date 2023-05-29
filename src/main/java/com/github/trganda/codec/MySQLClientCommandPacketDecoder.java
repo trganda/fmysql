@@ -22,41 +22,49 @@ import io.netty.handler.codec.DecoderException;
 import java.util.List;
 import java.util.Optional;
 
-public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder implements MySQLClientPacketDecoder {
+public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
+    implements MySQLClientPacketDecoder {
 
-	private final String database;
-	private final String userName;
-	private final byte[] scramble411;
+  private final String database;
+  private final String userName;
+  private final byte[] scramble411;
 
-	public MySQLClientCommandPacketDecoder(String database, String userName, byte[] scramble411) {
-		this(Constants.DEFAULT_MAX_PACKET_SIZE, database, userName, scramble411);
-	}
+  public MySQLClientCommandPacketDecoder(String database, String userName, byte[] scramble411) {
+    this(Constants.DEFAULT_MAX_PACKET_SIZE, database, userName, scramble411);
+  }
 
-	public MySQLClientCommandPacketDecoder(int maxPacketSize, String database, String userName, byte[] scramble411) {
-		super(maxPacketSize);
+  public MySQLClientCommandPacketDecoder(
+      int maxPacketSize, String database, String userName, byte[] scramble411) {
+    super(maxPacketSize);
 
-		this.database = database;
-		this.userName = userName;
-		this.scramble411 = scramble411;
-	}
+    this.database = database;
+    this.userName = userName;
+    this.scramble411 = scramble411;
+  }
 
-	@Override
-	protected void decodePacket(ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
-		final MySQLCharacterSet clientCharset = MySQLCharacterSet.getClientCharsetAttr(ctx.channel());
+  @Override
+  protected void decodePacket(
+      ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
+    final MySQLCharacterSet clientCharset = MySQLCharacterSet.getClientCharsetAttr(ctx.channel());
 
-		final byte commandCode = packet.readByte();
-		final Optional<Command> command = Command.findByCommandCode(commandCode);
-		if (!command.isPresent()) {
-			throw new DecoderException("Unknown command " + commandCode);
-		}
-		switch (command.get()) {
-			case COM_QUERY:
-				out.add(new QueryCommand(sequenceId,
-						CodecUtils.readFixedLengthString(packet, packet.readableBytes(), clientCharset.getCharset()),
-						database, userName, scramble411));
-				break;
-			default:
-				out.add(new CommandPacket(sequenceId, command.get()));
-		}
-	}
+    final byte commandCode = packet.readByte();
+    final Optional<Command> command = Command.findByCommandCode(commandCode);
+    if (!command.isPresent()) {
+      throw new DecoderException("Unknown command " + commandCode);
+    }
+    switch (command.get()) {
+      case COM_QUERY:
+        out.add(
+            new QueryCommand(
+                sequenceId,
+                CodecUtils.readFixedLengthString(
+                    packet, packet.readableBytes(), clientCharset.getCharset()),
+                database,
+                userName,
+                scramble411));
+        break;
+      default:
+        out.add(new CommandPacket(sequenceId, command.get()));
+    }
+  }
 }

@@ -16,47 +16,44 @@
 
 package com.github.trganda.engine;
 
-/**
- * A column of the result
- */
+/** A column of the result */
 public class QueryResultColumn {
 
-    private String name;
-    private String type;
+  private String name;
+  private String type;
 
-    public QueryResultColumn() {
-    }
+  public QueryResultColumn() {}
 
-    public QueryResultColumn(String name, String type) {
-        this.name = name;
-        this.type = type;
-    }
+  public QueryResultColumn(String name, String type) {
+    this.name = name;
+    this.type = type;
+  }
 
-    /**
-     * @return Column name
-     */
-    public String getName() {
-        return name;
-    }
+  /**
+   * @return Column name
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * @param name Column name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+  /**
+   * @param name Column name
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    /**
-     * @return Data type like 'varchar(255)'
-     */
-    public String getType() {
-        return type;
-    }
+  /**
+   * @return Data type like 'varchar(255)'
+   */
+  public String getType() {
+    return type;
+  }
 
-    /**
-     * @param type Data type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+  /**
+   * @param type Data type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
 }

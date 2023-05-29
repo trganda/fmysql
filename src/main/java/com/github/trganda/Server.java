@@ -260,7 +260,7 @@ public class Server implements AutoCloseable {
 
       if (isLoadLocalInFile(queryString)) {
         // response file name
-//        ctx.write()
+        //        ctx.write()
       } else {
         // generic response
         ctx.write(new ColumnCount(++sequenceId[0], 1));

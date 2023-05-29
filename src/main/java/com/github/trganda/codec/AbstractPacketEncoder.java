@@ -22,16 +22,15 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 public abstract class AbstractPacketEncoder<T extends MySQLPacket> extends MessageToByteEncoder<T> {
 
-	@Override
-	final protected void encode(ChannelHandlerContext ctx, T packet, ByteBuf buf) throws Exception {
-		final int writerIdx = buf.writerIndex();
-		buf.writeInt(0); // Advance the writer index so we can set the packet length after encoding
-		encodePacket(ctx, packet, buf);
-		final int len = buf.writerIndex() - writerIdx - 4;
-		buf.setMediumLE(writerIdx, len)
-				.setByte(writerIdx + 3, packet.getSequenceId());
-	}
+  @Override
+  protected final void encode(ChannelHandlerContext ctx, T packet, ByteBuf buf) throws Exception {
+    final int writerIdx = buf.writerIndex();
+    buf.writeInt(0); // Advance the writer index so we can set the packet length after encoding
+    encodePacket(ctx, packet, buf);
+    final int len = buf.writerIndex() - writerIdx - 4;
+    buf.setMediumLE(writerIdx, len).setByte(writerIdx + 3, packet.getSequenceId());
+  }
 
-	protected abstract void encodePacket(ChannelHandlerContext ctx, T packet, ByteBuf buf) throws Exception;
-
+  protected abstract void encodePacket(ChannelHandlerContext ctx, T packet, ByteBuf buf)
+      throws Exception;
 }

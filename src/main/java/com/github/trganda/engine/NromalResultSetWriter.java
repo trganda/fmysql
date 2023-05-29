@@ -1,11 +1,11 @@
-//package com.github.trganda.engine;
+// package com.github.trganda.engine;
 //
-//import com.github.trganda.codec.*;
-//import io.netty.channel.ChannelHandlerContext;
+// import com.github.trganda.codec.*;
+// import io.netty.channel.ChannelHandlerContext;
 //
-//import java.util.List;
+// import java.util.List;
 //
-//public class NromalResultSetWriter implements ResultSetWriter {
+// public class NromalResultSetWriter implements ResultSetWriter {
 //
 //  private ChannelHandlerContext ctx;
 //  private int[] sequenceId;
@@ -69,4 +69,4 @@
 //
 //    System.out.println("[mysql-protocol] All done");
 //  }
-//}
+// }

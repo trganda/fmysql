@@ -20,20 +20,19 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class StatisticsResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
-	private final String statString;
+  private final String statString;
 
-	public StatisticsResponse(int sequenceId, String statString) {
-		super(sequenceId);
-		this.statString = statString;
-	}
+  public StatisticsResponse(int sequenceId, String statString) {
+    super(sequenceId);
+    this.statString = statString;
+  }
 
-	@Override
-	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
-		visitor.visit(this, ctx);
-	}
+  @Override
+  public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+    visitor.visit(this, ctx);
+  }
 
-	public String getStatString() {
-		return statString;
-	}
-
+  public String getStatString() {
+    return statString;
+  }
 }

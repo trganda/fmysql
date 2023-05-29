@@ -23,8 +23,7 @@ public final class Utils {
     new SecureRandom().nextBytes(s);
     for (int i = 0; i < s.length; i++) {
       s[i] &= 0x7f;
-      if (s[i] == 0 || s[i] == 36)
-        s[i]++;
+      if (s[i] == 0 || s[i] == 36) s[i]++;
     }
     return s;
   }
@@ -37,20 +36,20 @@ public final class Utils {
   public static byte[] hexToBytes(String hex) {
     String s = hex.replace(" ", "");
     int len = s.length();
-    if ((len & 1) != 0)
-      throw new IllegalArgumentException("Odd number of characters.");
+    if ((len & 1) != 0) throw new IllegalArgumentException("Odd number of characters.");
 
     byte[] data = new byte[len / 2];
     for (int i = 0; i < len; i += 2) {
-      data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-          + Character.digit(s.charAt(i+1), 16));
+      data[i / 2] =
+          (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
     }
     return data;
   }
 
   public static boolean compareDigest(String a, String b) {
     if (a == null || b == null) return false;
-    return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
+    return MessageDigest.isEqual(
+        a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
   }
 
   public static String scramble411(String passwordSha1Hex, byte[] seedAsBytes) {

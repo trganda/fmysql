@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface ReplicationEvent extends Visitable {
   ReplicationEventHeader header();
+
   ReplicationEventPayload payload();
 
   @Override

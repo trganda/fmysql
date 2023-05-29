@@ -24,32 +24,31 @@ import java.util.Set;
 
 public class EofResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
-	private final int warnings;
-	private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
+  private final int warnings;
+  private final Set<ServerStatusFlag> statusFlags = EnumSet.noneOf(ServerStatusFlag.class);
 
-	public EofResponse(int sequenceId, int warnings, ServerStatusFlag... flags) {
-		super(sequenceId);
-		this.warnings = warnings;
-		Collections.addAll(statusFlags, flags);
-	}
+  public EofResponse(int sequenceId, int warnings, ServerStatusFlag... flags) {
+    super(sequenceId);
+    this.warnings = warnings;
+    Collections.addAll(statusFlags, flags);
+  }
 
-	public EofResponse(int sequenceId, int warnings, Collection<ServerStatusFlag> flags) {
-		super(sequenceId);
-		this.warnings = warnings;
-		statusFlags.addAll(flags);
-	}
+  public EofResponse(int sequenceId, int warnings, Collection<ServerStatusFlag> flags) {
+    super(sequenceId);
+    this.warnings = warnings;
+    statusFlags.addAll(flags);
+  }
 
-	public int getWarnings() {
-		return warnings;
-	}
+  public int getWarnings() {
+    return warnings;
+  }
 
-	public Set<ServerStatusFlag> getStatusFlags() {
-		return statusFlags;
-	}
+  public Set<ServerStatusFlag> getStatusFlags() {
+    return statusFlags;
+  }
 
-	@Override
-	public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
-		visitor.visit(this, ctx);
-	}
-
+  @Override
+  public void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+    visitor.visit(this, ctx);
+  }
 }
