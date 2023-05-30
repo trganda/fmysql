@@ -9,8 +9,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import io.netty.util.concurrent.EventExecutorGroup;
 import jdk.net.ExtendedSocketOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,40 +28,19 @@ public class Server implements AutoCloseable {
   private final SQLEngine sqlEngine;
   private final int port;
   private final Channel channel;
-  private final io.netty.channel.EventLoopGroup parentGroup;
-  private final EventLoopGroup childGroup;
-  private final EventExecutorGroup eventExecutorGroup;
+  private final io.netty.channel.EventLoopGroup bossGroup;
+  private final EventLoopGroup workerGroup;
 
   public Server(int port, int executorGroupSize, SQLEngine sqlEngine) {
     this.port = port;
     this.sqlEngine = sqlEngine;
 
-    parentGroup = new NioEventLoopGroup();
-    childGroup = new NioEventLoopGroup();
-    eventExecutorGroup = new DefaultEventExecutorGroup(executorGroupSize);
-    /*
-    With default settings of Aliyun ECS, a connection living
-    for a long time (more than about 15 minutes) would be
-    forcibly closed by the firewall, which is unacceptable
-    for slow SQL queries. So we have to enable TCP keep-alive
-    to allow the OS to send heartbeats and reduce the interval
-    to less than the time valve which is 910 seconds.
-    Reference: https://zhuanlan.zhihu.com/p/52622856
+    bossGroup = new NioEventLoopGroup();
+    workerGroup = new NioEventLoopGroup();
 
-    Steps for the OS:
-    sysctl -a | grep keepalive
-    vi /etc/sysctl.conf
-    net.ipv4.tcp_keepalive_time=300
-    sysctl -p
-    sysctl -a | grep keepalive
-
-    Steps for Netty:
-    .option(ChannelOption.SO_KEEPALIVE, true)
-    .childOption(ChannelOption.SO_KEEPALIVE, true)
-    */
     final ChannelFuture channelFuture =
         new ServerBootstrap()
-            .group(parentGroup, childGroup)
+            .group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
             .option(NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPIDLE), 300)
             .childOption(ChannelOption.SO_KEEPALIVE, true)
@@ -71,11 +48,11 @@ public class Server implements AutoCloseable {
                 new ChannelInitializer<NioSocketChannel>() {
                   @Override
                   protected void initChannel(NioSocketChannel ch) throws Exception {
-                    logger.info("[mysql-protocol] Initializing child channel");
+                    logger.info("Initializing child channel");
                     final ChannelPipeline pipeline = ch.pipeline();
                     pipeline.addLast(new MySQLServerPacketEncoder());
                     pipeline.addLast(new MySQLClientConnectionPacketDecoder());
-                    pipeline.addLast(eventExecutorGroup, new ServerHandler());
+                    pipeline.addLast(new ServerHandler());
                   }
                 })
             .bind(port);
@@ -84,15 +61,14 @@ public class Server implements AutoCloseable {
     if (!channel.isActive()) {
       throw new RuntimeException("MySQL listening on port " + port + " failed");
     }
-    logger.info("[mysql-protocol] MySQL server listening on port " + port + " started");
+    logger.info("MySQL server listening on port " + port + " started");
   }
 
   @Override
   public void close() {
     channel.close();
-    eventExecutorGroup.shutdownGracefully().awaitUninterruptibly();
-    childGroup.shutdownGracefully().awaitUninterruptibly();
-    parentGroup.shutdownGracefully().awaitUninterruptibly();
+    workerGroup.shutdownGracefully().awaitUninterruptibly();
+    bossGroup.shutdownGracefully().awaitUninterruptibly();
   }
 
   private class ServerHandler extends ChannelInboundHandlerAdapter {
@@ -111,7 +87,7 @@ public class Server implements AutoCloseable {
           ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
       int connectionId = Integer.parseUnsignedInt(ctx.channel().id().asShortText(), 16);
 
-      logger.info("[mysql-protocol] Server channel active");
+      logger.info("Server channel active");
       final EnumSet<CapabilityFlags> capabilities = CapabilityFlags.getImplicitCapabilities();
       CapabilityFlags.setCapabilitiesAttr(ctx.channel(), capabilities);
       // sending greeting info of server
@@ -127,7 +103,7 @@ public class Server implements AutoCloseable {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-      logger.info("[mysql-protocol] Server channel inactive: " + new Date());
+      logger.info("Server channel inactive: " + new Date());
     }
 
     @Override
@@ -137,14 +113,14 @@ public class Server implements AutoCloseable {
       } else if (msg instanceof QueryCommand) {
         handleQuery(ctx, (QueryCommand) msg, salt, remoteAddr);
       } else {
-        logger.info("[mysql-protocol] Received message: " + msg);
+        logger.info("Received message: " + msg);
 
         // Prevent hanging on client connection.
         if (msg instanceof CommandPacket) {
           CommandPacket commandPacket = (CommandPacket) msg;
           Command command = commandPacket.getCommand();
           int sequenceId = commandPacket.getSequenceId();
-          logger.info("[mysql-protocol] Received command: " + command);
+          logger.info("Received command: " + command);
           if (command.equals(Command.COM_QUIT)) {
             ctx.flush();
             ctx.close();
@@ -173,19 +149,19 @@ public class Server implements AutoCloseable {
 
   private void handleHandshakeResponse(
       ChannelHandlerContext ctx, HandshakeResponse response, byte[] salt, String remoteAddr) {
-    logger.info("[mysql-protocol] Received handshake response " + remoteAddr);
+    logger.info("Received handshake response " + remoteAddr);
 
-    logger.info("[mysql-protocol] attrs = " + response.getAttributes());
-    logger.info("[mysql-protocol] flags = " + response.getCapabilityFlags());
+    logger.info("attrs = " + response.getAttributes());
+    logger.info("flags = " + response.getCapabilityFlags());
 
     int readableBytes = response.getAuthPluginData().readableBytes();
     String authPluginName = response.getAuthPluginName();
-    logger.info("[mysql-protocol] Auth plugin name: " + authPluginName + ", " + readableBytes);
+    logger.info("Auth plugin name: " + authPluginName + ", " + readableBytes);
 
     // Processing AuthSwitchRequest while authPluginName or auth data length wrong
     String requestAuthPluginName = Constants.DEFAULT_AUTH_PLUGIN_NAME;
     if (!requestAuthPluginName.equals(authPluginName)) {
-      logger.info("[mysql-protocol] Send AuthSwitchRequest " + requestAuthPluginName);
+      logger.info("Send AuthSwitchRequest " + requestAuthPluginName);
       ctx.writeAndFlush(
           new AuthSwitchRequest(response.getSequenceId() + 1, requestAuthPluginName, salt));
       response.setAuthPluginName(requestAuthPluginName);
@@ -197,7 +173,7 @@ public class Server implements AutoCloseable {
     byte[] scramble411 = new byte[readableBytes];
     response.getAuthPluginData().readBytes(scramble411);
 
-    logger.info("[mysql-protocol] scramble411: " + Base64.getEncoder().encodeToString(scramble411));
+    logger.info("scramble411: " + Base64.getEncoder().encodeToString(scramble411));
 
     ctx.pipeline()
         .replace(
@@ -210,7 +186,7 @@ public class Server implements AutoCloseable {
       sqlEngine.authenticate(response.getDatabase(), response.getUsername(), scramble411, salt);
     } catch (IOException e) {
       logger.info(
-          "[mysql-protocol] Sql query exception: " + response.getUsername() + ", " + remoteAddr);
+          "Sql query exception: " + response.getUsername() + ", " + remoteAddr);
       e.printStackTrace();
 
       Throwable cause = e.getCause();
@@ -239,7 +215,7 @@ public class Server implements AutoCloseable {
     final String userName = query.getUserName();
     final byte[] scramble411 = query.getScramble411();
     logger.info(
-        "[mysql-protocol] Received query: "
+        "Received query: "
             + ((queryString.startsWith("insert") && queryString.length() > 200)
                 ? queryString.substring(0, 200)
                 : queryString)
@@ -281,7 +257,7 @@ public class Server implements AutoCloseable {
         ctx.write(new EOFResponse(++sequenceId[0], 0));
         ctx.writeAndFlush(new EOFResponse(++sequenceId[0], 0));
       }
-      logger.info("[mysql-protocol] Query done");
+      logger.info("Query done");
     }
   }
 
@@ -501,7 +477,7 @@ public class Server implements AutoCloseable {
           values.add("1");
           break;
         default:
-          logger.info("[mysql-protocol] Unknown system variable: " + systemVariable);
+          logger.info("Unknown system variable: " + systemVariable);
           throw new Error("Unknown system variable " + systemVariable);
       }
     }
@@ -510,7 +486,7 @@ public class Server implements AutoCloseable {
       ctx.write(columnDefinition);
     }
     ctx.write(new EOFResponse(++sequenceId, 0));
-    ctx.write(new ResultsetRow(++sequenceId, values.toArray(new String[values.size()])));
+    ctx.write(new ResultSetRow(++sequenceId, values.toArray(new String[values.size()])));
     ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
   }
 

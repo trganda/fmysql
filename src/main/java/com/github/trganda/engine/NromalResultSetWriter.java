@@ -49,7 +49,7 @@
 //    }
 //    ctx.write(new EofResponse(++sequenceId[0], 0));
 //
-//    System.out.println("[mysql-protocol] Columns done");
+//    System.out.println("Columns done");
 //
 //    columnsWritten[0] = !columns.isEmpty();
 //  }
@@ -67,6 +67,6 @@
 //  public void finish() {
 //    ctx.writeAndFlush(new EofResponse(++sequenceId[0], 0));
 //
-//    System.out.println("[mysql-protocol] All done");
+//    System.out.println("All done");
 //  }
 // }

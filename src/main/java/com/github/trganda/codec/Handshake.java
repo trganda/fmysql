@@ -156,7 +156,7 @@ public class Handshake extends DefaultByteBufHolder implements MySQLServerPacket
       capabilities.add(CapabilityFlags.CLIENT_PLUGIN_AUTH);
       this.authPluginName = authPluginName;
 
-      System.out.println("[mysql-protocol] authPluginName = " + authPluginName);
+      System.out.println("authPluginName = " + authPluginName);
 
       return this;
     }

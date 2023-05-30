@@ -115,7 +115,7 @@ public class TestServer implements AutoCloseable {
           CommandPacket commandPacket = (CommandPacket) msg;
           Command command = commandPacket.getCommand();
           int sequenceId = commandPacket.getSequenceId();
-          System.out.println("[mysql-protocol] Received command: " + command);
+          System.out.println("Received command: " + command);
           if (command.equals(Command.COM_QUIT)) {
             ctx.flush();
             ctx.close();
@@ -175,7 +175,7 @@ public class TestServer implements AutoCloseable {
               .decimals(5)
               .build());
       ctx.write(new EOFResponse(++sequenceId, 0));
-      ctx.write(new ResultsetRow(++sequenceId, "1"));
+      ctx.write(new ResultSetRow(++sequenceId, "1"));
       ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
     }
   }
@@ -362,7 +362,7 @@ public class TestServer implements AutoCloseable {
           values.add("1");
           break;
         default:
-          System.err.println("[mysql-protocol] Unknown system variable: " + systemVariable);
+          System.err.println("Unknown system variable: " + systemVariable);
           throw new Error("Unknown system variable " + systemVariable);
       }
     }
@@ -371,7 +371,7 @@ public class TestServer implements AutoCloseable {
       ctx.write(columnDefinition);
     }
     ctx.write(new EOFResponse(++sequenceId, 0));
-    ctx.write(new ResultsetRow(++sequenceId, values.toArray(new String[0])));
+    ctx.write(new ResultSetRow(++sequenceId, values.toArray(new String[0])));
     ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
   }
 

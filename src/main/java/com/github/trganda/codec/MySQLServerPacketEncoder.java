@@ -31,12 +31,12 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
       encodeOkResponse(capabilities, serverCharset, (OkResponse) packet, buf);
     } else if (packet instanceof ErrorResponse) {
       encodeErrorResponse(capabilities, serverCharset, (ErrorResponse) packet, buf);
-    } else if (packet instanceof ResultsetRow) {
-      encodeResultSetRow(serverCharset, (ResultsetRow) packet, buf);
+    } else if (packet instanceof ResultSetRow) {
+      encodeResultSetRow(serverCharset, (ResultSetRow) packet, buf);
     } else if (packet instanceof LoadInFileResponse) {
       encodeLoadInFileResponse(serverCharset, (LoadInFileResponse) packet, buf);
     } else {
-      String msg = "[mysql-protocol] Unknown packet type: " + packet.getClass();
+      String msg = "Unknown packet type: " + packet.getClass();
       System.out.println(msg);
       throw new IllegalStateException(msg);
     }
@@ -152,7 +152,7 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
     ByteBufUtil.writeUtf8(buf, packet.getMessage());
   }
 
-  protected void encodeResultSetRow(Charset serverCharset, ResultsetRow packet, ByteBuf buf) {
+  protected void encodeResultSetRow(Charset serverCharset, ResultSetRow packet, ByteBuf buf) {
     for (String value : packet.getValues()) {
       CodecUtils.writeLengthEncodedString(buf, value, serverCharset);
     }

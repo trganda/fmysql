@@ -160,6 +160,6 @@ public class MySQLServerResultSetPacketDecoder extends AbstractPacketDecoder
           CodecUtils.readLengthEncodedString(
               packet, columnDefinitions.get(i).getCharacterSet().getCharset());
     }
-    out.add(new ResultsetRow(sequenceId, values));
+    out.add(new ResultSetRow(sequenceId, values));
   }
 }
