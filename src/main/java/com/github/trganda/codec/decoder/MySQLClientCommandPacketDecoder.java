@@ -1,5 +1,7 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.decoder;
 
+import com.github.trganda.codec.CodecUtils;
+import com.github.trganda.codec.QueryCommand;
 import com.github.trganda.codec.constants.Command;
 import com.github.trganda.codec.constants.Constants;
 import com.github.trganda.codec.constants.MySQLCharacterSet;

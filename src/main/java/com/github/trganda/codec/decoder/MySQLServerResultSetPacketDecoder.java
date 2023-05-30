@@ -1,5 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.decoder;
 
+import com.github.trganda.codec.CodecUtils;
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.ColumnFlag;
 import com.github.trganda.codec.constants.ColumnType;

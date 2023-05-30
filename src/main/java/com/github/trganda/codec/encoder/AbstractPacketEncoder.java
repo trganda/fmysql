@@ -1,5 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.encoder;
 
+import com.github.trganda.codec.packets.MySQLPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

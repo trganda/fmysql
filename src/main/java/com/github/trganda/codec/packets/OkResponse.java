@@ -1,6 +1,5 @@
 package com.github.trganda.codec.packets;
 
-import com.github.trganda.codec.MySQLServerPacket;
 import com.github.trganda.codec.MySQLServerPacketVisitor;
 import com.github.trganda.codec.constants.ServerStatusFlag;
 import io.netty.channel.ChannelHandlerContext;

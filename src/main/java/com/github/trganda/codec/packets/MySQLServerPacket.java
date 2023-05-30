@@ -1,3 +1,3 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
 
 public interface MySQLServerPacket extends MySQLPacket {}
