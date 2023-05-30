@@ -2,6 +2,7 @@ package com.github.trganda.codec;
 
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.MySQLCharacterSet;
+import com.github.trganda.codec.packets.CommandPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import java.nio.charset.Charset;

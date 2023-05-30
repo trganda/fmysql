@@ -1,5 +1,7 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
 
+import com.github.trganda.codec.MySQLServerPacket;
+import com.github.trganda.codec.MySQLServerPacketVisitor;
 import io.netty.channel.ChannelHandlerContext;
 
 /** This packet indicates that an error occurred. */

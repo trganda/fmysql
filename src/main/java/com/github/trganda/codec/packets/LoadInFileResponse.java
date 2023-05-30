@@ -1,4 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
+
+import com.github.trganda.codec.MySQLServerPacket;
 
 import static com.github.trganda.codec.constants.Constants.LOAD_LOCAL_IN_FILE_RESPONSE_FLAG;
 

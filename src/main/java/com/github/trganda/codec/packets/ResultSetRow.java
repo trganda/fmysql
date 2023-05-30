@@ -1,4 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
+
+import com.github.trganda.codec.MySQLServerPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;

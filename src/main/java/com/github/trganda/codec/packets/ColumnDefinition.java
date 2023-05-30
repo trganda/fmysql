@@ -1,5 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
 
+import com.github.trganda.codec.MySQLServerPacket;
 import com.github.trganda.codec.constants.ColumnFlag;
 import com.github.trganda.codec.constants.ColumnType;
 import com.github.trganda.codec.constants.MySQLCharacterSet;

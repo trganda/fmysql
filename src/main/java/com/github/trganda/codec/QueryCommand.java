@@ -1,6 +1,7 @@
 package com.github.trganda.codec;
 
 import com.github.trganda.codec.constants.Command;
+import com.github.trganda.codec.packets.CommandPacket;
 
 public class QueryCommand extends CommandPacket {
 
