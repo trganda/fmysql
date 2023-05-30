@@ -1,4 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
+
+import com.github.trganda.codec.ReplicationEventPayload;
 
 public class RotateEventPayload implements ReplicationEventPayload {
   private final long pos;

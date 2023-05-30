@@ -1,5 +1,6 @@
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.packets.ReplicationEventHeader;
 import io.netty.channel.ChannelHandlerContext;
 
 public interface ReplicationEvent extends Visitable {

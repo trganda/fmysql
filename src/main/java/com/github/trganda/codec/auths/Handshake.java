@@ -1,5 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.auths;
 
+import com.github.trganda.codec.MySQLServerPacketVisitor;
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.Constants;
 import com.github.trganda.codec.constants.MySQLCharacterSet;

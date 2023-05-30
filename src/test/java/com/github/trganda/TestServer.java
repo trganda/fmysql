@@ -1,6 +1,7 @@
 package com.github.trganda;
 
-import com.github.trganda.codec.*;
+import com.github.trganda.codec.auths.Handshake;
+import com.github.trganda.codec.auths.HandshakeResponse;
 import com.github.trganda.codec.constants.*;
 import com.github.trganda.codec.decoder.MySQLClientCommandPacketDecoder;
 import com.github.trganda.codec.decoder.MySQLClientConnectionPacketDecoder;

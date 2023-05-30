@@ -1,5 +1,6 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.auths;
 
+import com.github.trganda.codec.auths.Handshake;
 import io.netty.buffer.ByteBuf;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

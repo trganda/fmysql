@@ -1,8 +1,8 @@
 package com.github.trganda.codec.encoder;
 
 import com.github.trganda.codec.CodecUtils;
-import com.github.trganda.codec.HandshakeResponse;
-import com.github.trganda.codec.QueryCommand;
+import com.github.trganda.codec.auths.HandshakeResponse;
+import com.github.trganda.codec.packets.QueryCommand;
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.packets.CommandPacket;

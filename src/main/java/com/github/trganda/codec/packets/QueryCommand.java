@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.packets;
 
 import com.github.trganda.codec.constants.Command;
 import com.github.trganda.codec.packets.CommandPacket;

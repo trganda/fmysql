@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.auths;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

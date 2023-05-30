@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.auths;
 
 import com.github.trganda.codec.constants.CapabilityFlags;
 
