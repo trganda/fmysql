@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.constants;
 
 /** https://dev.mysql.com/doc/internals/en/com-query-response.html#column-type */
 public enum ColumnType {

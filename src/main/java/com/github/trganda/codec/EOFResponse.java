@@ -1,5 +1,6 @@
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.constants.ServerStatusFlag;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.Collection;
 import java.util.Collections;

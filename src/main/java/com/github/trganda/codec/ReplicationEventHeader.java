@@ -1,5 +1,7 @@
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.constants.ReplicationEventType;
+
 public class ReplicationEventHeader {
 
   private long timestamp;

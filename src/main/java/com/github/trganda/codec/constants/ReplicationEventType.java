@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.constants;
 
 /** https://mariadb.com/kb/en/2-binlog-event-header/ */
 public enum ReplicationEventType {

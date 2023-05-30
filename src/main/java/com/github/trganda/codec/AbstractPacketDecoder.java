@@ -16,6 +16,9 @@
 
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.constants.CapabilityFlags;
+import com.github.trganda.codec.constants.Constants;
+import com.github.trganda.codec.constants.ServerStatusFlag;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

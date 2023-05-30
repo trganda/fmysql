@@ -1,6 +1,6 @@
 package com.github.trganda.codec;
 
-import static com.github.trganda.codec.Constants.LOAD_LOCAL_IN_FILE_RESPONSE_FLAG;
+import static com.github.trganda.codec.constants.Constants.LOAD_LOCAL_IN_FILE_RESPONSE_FLAG;
 
 public class LoadInFileResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 

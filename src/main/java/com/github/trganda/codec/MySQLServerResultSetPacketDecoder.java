@@ -1,5 +1,9 @@
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.constants.CapabilityFlags;
+import com.github.trganda.codec.constants.ColumnFlag;
+import com.github.trganda.codec.constants.ColumnType;
+import com.github.trganda.codec.constants.MySQLCharacterSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

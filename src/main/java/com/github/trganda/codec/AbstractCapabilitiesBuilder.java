@@ -1,5 +1,7 @@
 package com.github.trganda.codec;
 
+import com.github.trganda.codec.constants.CapabilityFlags;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;

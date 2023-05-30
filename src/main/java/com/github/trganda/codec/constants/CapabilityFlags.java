@@ -1,4 +1,4 @@
-package com.github.trganda.codec;
+package com.github.trganda.codec.constants;
 
 import io.netty.channel.Channel;
 import io.netty.util.Attribute;

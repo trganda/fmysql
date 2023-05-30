@@ -1,6 +1,7 @@
 package com.github.trganda;
 
 import com.github.trganda.codec.*;
+import com.github.trganda.codec.constants.*;
 import com.github.trganda.engine.SQLEngine;
 import com.github.trganda.utils.Utils;
 import io.netty.bootstrap.ServerBootstrap;
