@@ -15,6 +15,9 @@ public interface Constants {
   int AUTH_PLUGIN_DATA_MIN_LEN = AUTH_PLUGIN_DATA_PART1_LEN + AUTH_PLUGIN_DATA_PART2_MIN_LEN;
   int HANDSHAKE_RESERVED_BYTES = 10;
 
+  // Load Local in File
+  byte LOAD_LOCAL_IN_FILE_RESPONSE_FLAG = (byte) 0xFB;
+
   // Auth plugins
   String DEFAULT_AUTH_PLUGIN_NAME = "mysql_native_password";
   String CACHING_SHA2_PASSWORD = "caching_sha2_password";
