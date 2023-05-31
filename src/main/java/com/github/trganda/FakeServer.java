@@ -180,12 +180,12 @@ public class FakeServer implements AutoCloseable {
               .name("name")
               .orgName("org_name")
               .columnLength(10)
-              .type(ColumnType.MYSQL_TYPE_DOUBLE)
-              .addFlags(ColumnFlag.NUM)
+              .type(ColumnType.MYSQL_TYPE_MEDIUM_BLOB)
+              .addFlags(ColumnFlag.BLOB)
               .decimals(5)
               .build());
       ctx.write(new EOFResponse(++sequenceId, 0));
-      ctx.write(new ResultSetRow(++sequenceId, "1"));
+      ctx.write(new ResultSetRow(++sequenceId, Utils.payload("cc5.bin")));
       ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
     }
   }

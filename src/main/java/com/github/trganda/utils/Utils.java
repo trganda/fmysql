@@ -1,5 +1,9 @@
 package com.github.trganda.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.charset.StandardCharsets;
@@ -8,10 +12,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Base64;
 
 public final class Utils {
-
+  private static final Logger logger = LoggerFactory.getLogger(Utils.class);
   private static final ZoneOffset BEIJING_TIMEZONE = ZoneOffset.of("+8");
 
   public static LocalDateTime getLocalDateTimeNow() {
@@ -77,5 +82,20 @@ public final class Utils {
     }
 
     return Base64.getEncoder().encodeToString(toBeXord);
+  }
+
+  public static String payload(String name) {
+    try (InputStream fis = Utils.class.getClassLoader().getResourceAsStream(name);) {
+      assert fis != null;
+      byte[] bytes = new byte[fis.available()];
+      int cnt = fis.read(bytes);
+      if (cnt == -1) {
+        return "";
+      }
+      return new String(bytes, StandardCharsets.US_ASCII);
+    } catch (IOException e) {
+      logger.error(e.getMessage(), e);
+      return "";
+    }
   }
 }

@@ -1,6 +1,9 @@
 package com.github.trganda.codec.constants;
 
-/** https://dev.mysql.com/doc/internals/en/com-query-response.html#column-type */
+/**
+ * refer: <a
+ * href="https://github.com/mysql/mysql-server/blob/ea7087d885006918ad54458e7aad215b1650312c/include/field_types.h#L52">field_types.h</a>
+ */
 public enum ColumnType {
   MYSQL_TYPE_DECIMAL(0x00),
   MYSQL_TYPE_TINY(0x01),

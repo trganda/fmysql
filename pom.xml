@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <netty.version>4.1.86.Final</netty.version>
-        <mysql.version>8.0.28</mysql.version>
+        <mysql.version>8.0.11</mysql.version>
     </properties>
 
     <dependencies>
@@ -35,6 +35,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
         </dependency>
 
         <!-- Logging -->
