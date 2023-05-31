@@ -9,17 +9,43 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+/**
+ * Column Definition of <a
+ * href="https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset_column_definition.html#sect_protocol_com_query_response_text_resultset_column_definition_41">Protocol::ColumnDefinition41</a>
+ */
 public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServerPacket {
+  /** The catalog used. Currently, always "def" */
   private final String catalog;
+  /** Schema name */
   private final String schema;
+  /** Virtual table name */
   private final String table;
+  /** Physical table name */
   private final String orgTable;
+  /** Virtual column name */
   private final String name;
+  /** Physical column name */
   private final String orgName;
+  /** The column character set */
   private final MySQLCharacterSet characterSet;
+  /** Maximum length of the field */
   private final long columnLength;
+  /**
+   * Type of the column as defined in
+   *
+   * @see com.github.trganda.codec.constants.ColumnType
+   */
   private final ColumnType type;
+  /**
+   * Flag of the column as defined in
+   *
+   * @see com.github.trganda.codec.constants.ColumnFlag
+   */
   private final Set<ColumnFlag> flags = EnumSet.noneOf(ColumnFlag.class);
+  /**
+   * Max shown decimal digits: - 0x00 for integers and static strings - 0x1f for dynamic strings,
+   * double, float - 0x00 to 0x51 for decimals
+   */
   private final int decimals;
 
   private ColumnDefinition(Builder builder) {
@@ -104,6 +130,10 @@ public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServer
       return this;
     }
 
+    public Builder catalog() {
+      return this.catalog("def");
+    }
+
     public Builder catalog(String catalog) {
       this.catalog = catalog;
       return this;
@@ -155,7 +185,7 @@ public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServer
     }
 
     public Builder addFlags(Collection<ColumnFlag> flags) {
-      flags.addAll(flags);
+      this.flags.addAll(flags);
       return this;
     }
 

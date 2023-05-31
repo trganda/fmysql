@@ -173,16 +173,16 @@ public class FakeServer implements AutoCloseable {
       ctx.write(
           ColumnDefinition.builder()
               .sequenceId(++sequenceId)
-              .catalog("catalog")
+              .catalog()
               .schema("schema")
               .table("table")
               .orgTable("org_table")
               .name("name")
               .orgName("org_name")
               .columnLength(10)
-              .type(ColumnType.MYSQL_TYPE_MEDIUM_BLOB)
+              .type(ColumnType.MYSQL_TYPE_BLOB)
               .addFlags(ColumnFlag.BLOB)
-              .decimals(5)
+              .decimals(0x00)
               .build());
       ctx.write(new EOFResponse(++sequenceId, 0));
       ctx.write(new ResultSetRow(++sequenceId, Utils.payload("cc5.bin")));
