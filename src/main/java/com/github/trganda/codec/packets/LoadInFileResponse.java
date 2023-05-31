@@ -4,9 +4,9 @@ import static com.github.trganda.codec.constants.Constants.LOAD_LOCAL_IN_FILE_RE
 
 public class LoadInFileResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
-  private byte flag;
+  private final byte flag;
 
-  private String file;
+  private final String file;
 
   public LoadInFileResponse(Builder builder) {
     super(builder.sequenceId);

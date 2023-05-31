@@ -5,103 +5,97 @@ import com.github.trganda.codec.auths.HandshakeResponse;
 import com.github.trganda.codec.constants.*;
 import com.github.trganda.codec.decoder.MySQLClientCommandPacketDecoder;
 import com.github.trganda.codec.decoder.MySQLClientConnectionPacketDecoder;
+import com.github.trganda.codec.decoder.MySQLClientFilePacketDecoder;
 import com.github.trganda.codec.decoder.MySQLClientPacketDecoder;
 import com.github.trganda.codec.encoder.MySQLServerPacketEncoder;
 import com.github.trganda.codec.packets.*;
-import com.github.trganda.engine.SQLEngine;
 import com.github.trganda.utils.Utils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import jdk.net.ExtendedSocketOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.trganda.handler.Constants.VERSION;
-
-public class Server implements AutoCloseable {
-  private static final Logger logger = LoggerFactory.getLogger(Server.class);
-
-  private final SQLEngine sqlEngine;
+public class FakeServer implements AutoCloseable {
+  private static final Logger logger = LoggerFactory.getLogger(FakeServer.class);
+  private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\sAS\\s(\\w+)");
+  private static final String VERSION = "5.3.1";
   private final int port;
+  private final String user = "user";
   private final Channel channel;
-  private final io.netty.channel.EventLoopGroup bossGroup;
-  private final EventLoopGroup workerGroup;
+  private final EventLoopGroup parentGroup;
+  private final EventLoopGroup childGroup;
+  private String password = "password";
 
-  public Server(int port, int executorGroupSize, SQLEngine sqlEngine) {
+  public FakeServer(int port) {
     this.port = port;
-    this.sqlEngine = sqlEngine;
 
-    bossGroup = new NioEventLoopGroup();
-    workerGroup = new NioEventLoopGroup();
-
+    parentGroup = new NioEventLoopGroup();
+    childGroup = new NioEventLoopGroup();
     final ChannelFuture channelFuture =
         new ServerBootstrap()
-            .group(bossGroup, workerGroup)
+            .group(parentGroup, childGroup)
             .channel(NioServerSocketChannel.class)
-            .option(NioChannelOption.of(ExtendedSocketOptions.TCP_KEEPIDLE), 300)
-            .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childHandler(
                 new ChannelInitializer<NioSocketChannel>() {
                   @Override
                   protected void initChannel(NioSocketChannel ch) throws Exception {
                     logger.info("Initializing child channel");
                     final ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast(new MySQLServerPacketEncoder());
-                    pipeline.addLast(new MySQLClientConnectionPacketDecoder());
-                    pipeline.addLast(new ServerHandler());
+                    pipeline.addLast("encoder", new MySQLServerPacketEncoder());
+                    pipeline.addLast("decoder", new MySQLClientConnectionPacketDecoder());
+                    pipeline.addLast("handler", new ServerHandler());
                   }
                 })
             .bind(port);
     channel = channelFuture.channel();
     channelFuture.awaitUninterruptibly();
-    if (!channel.isActive()) {
-      throw new RuntimeException("MySQL listening on port " + port + " failed");
-    }
-    logger.info("MySQL server listening on port " + port + " started");
+    logger.info("Test MySQL server listening on port " + port);
   }
 
   @Override
   public void close() {
     channel.close();
-    workerGroup.shutdownGracefully().awaitUninterruptibly();
-    bossGroup.shutdownGracefully().awaitUninterruptibly();
+    childGroup.shutdownGracefully().awaitUninterruptibly();
+    parentGroup.shutdownGracefully().awaitUninterruptibly();
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public String getUser() {
+    return user;
   }
 
   private class ServerHandler extends ChannelInboundHandlerAdapter {
-    private final byte[] salt;
-    private String remoteAddr;
+    /** salt for mysql_native_password plugin */
+    private final byte[] salt = new byte[20];
 
     public ServerHandler() {
-      // 20 random bytes with ASCII characters
-      salt = Utils.generateRandomAsciiBytes(20);
+      new Random().nextBytes(salt);
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-      // todo may java.lang.NullPointerException
-      this.remoteAddr =
-          ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
-      int connectionId = Integer.parseUnsignedInt(ctx.channel().id().asShortText(), 16);
-
+    public void channelActive(ChannelHandlerContext ctx) {
       logger.info("Server channel active");
       final EnumSet<CapabilityFlags> capabilities = CapabilityFlags.getImplicitCapabilities();
       CapabilityFlags.setCapabilitiesAttr(ctx.channel(), capabilities);
-      // sending greeting info of server
+      // sending greeting info of mysql server
       ctx.writeAndFlush(
           Handshake.builder()
-              .serverVersion(VERSION)
-              .connectionId(connectionId)
+              .serverVersion("5.3.1")
+              .connectionId(1)
               .addAuthData(salt)
               .characterSet(MySQLCharacterSet.UTF8_BIN)
               .addCapabilities(capabilities)
@@ -110,15 +104,19 @@ public class Server implements AutoCloseable {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-      logger.info("Server channel inactive: " + new Date());
+      logger.info("Server channel inactive");
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+      // received request from mysql client
       if (msg instanceof HandshakeResponse) {
-        handleHandshakeResponse(ctx, (HandshakeResponse) msg, salt, remoteAddr);
+        // login request normally
+        handleHandshakeResponse(ctx, (HandshakeResponse) msg);
       } else if (msg instanceof QueryCommand) {
-        handleQuery(ctx, (QueryCommand) msg, salt, remoteAddr);
+        handleQuery(ctx, (QueryCommand) msg);
+      } else if (msg instanceof LoadInFileContentPacket) {
+        logger.info(((LoadInFileContentPacket) msg).getContent());
       } else {
         logger.info("Received message: " + msg);
 
@@ -127,7 +125,7 @@ public class Server implements AutoCloseable {
           CommandPacket commandPacket = (CommandPacket) msg;
           Command command = commandPacket.getCommand();
           int sequenceId = commandPacket.getSequenceId();
-          logger.info("Received command: " + command);
+          System.out.println("Received command: " + command);
           if (command.equals(Command.COM_QUIT)) {
             ctx.flush();
             ctx.close();
@@ -146,140 +144,56 @@ public class Server implements AutoCloseable {
         }
       }
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-      cause.printStackTrace();
-      ctx.close();
-    }
   }
 
-  private void handleHandshakeResponse(
-      ChannelHandlerContext ctx, HandshakeResponse response, byte[] salt, String remoteAddr) {
-    logger.info("Received handshake response " + remoteAddr);
-
-    logger.info("attrs = " + response.getAttributes());
-    logger.info("flags = " + response.getCapabilityFlags());
-
-    int readableBytes = response.getAuthPluginData().readableBytes();
-    String authPluginName = response.getAuthPluginName();
-    logger.info("Auth plugin name: " + authPluginName + ", " + readableBytes);
-
-    // Processing AuthSwitchRequest while authPluginName or auth data length wrong
-    String requestAuthPluginName = Constants.DEFAULT_AUTH_PLUGIN_NAME;
-    if (!requestAuthPluginName.equals(authPluginName)) {
-      logger.info("Send AuthSwitchRequest " + requestAuthPluginName);
-      ctx.writeAndFlush(
-          new AuthSwitchRequest(response.getSequenceId() + 1, requestAuthPluginName, salt));
-      response.setAuthPluginName(requestAuthPluginName);
-      MySQLClientConnectionPacketDecoder connPacketDecoder =
-          ctx.pipeline().get(MySQLClientConnectionPacketDecoder.class);
-      connPacketDecoder.setAuthSwitchStatus(1);
-      return;
-    }
-    byte[] scramble411 = new byte[readableBytes];
-    response.getAuthPluginData().readBytes(scramble411);
-
-    logger.info("scramble411: " + Base64.getEncoder().encodeToString(scramble411));
-
-    ctx.pipeline()
-        .replace(
-            MySQLClientPacketDecoder.class,
-            "CommandPacketDecoder",
-            new MySQLClientCommandPacketDecoder(
-                response.getDatabase(), response.getUsername(), scramble411));
-
-    try {
-      sqlEngine.authenticate(response.getDatabase(), response.getUsername(), scramble411, salt);
-    } catch (IOException e) {
-      logger.info(
-          "Sql query exception: " + response.getUsername() + ", " + remoteAddr);
-      e.printStackTrace();
-
-      Throwable cause = e.getCause();
-      int errorCode;
-      byte[] sqlState;
-      String errMsg = Utils.getLocalDateTimeNow() + " " + cause.getMessage() + e.getMessage();
-      if (cause instanceof IllegalAccessException) {
-        errorCode = 1045;
-        sqlState = "#28000".getBytes(StandardCharsets.US_ASCII);
-      } else {
-        errorCode = 1105;
-        sqlState = "#HY000".getBytes(StandardCharsets.US_ASCII);
-      }
-      ctx.writeAndFlush(
-          new ErrorResponse(response.getSequenceId() + 1, errorCode, sqlState, errMsg));
-      return;
-    }
-
-    ctx.writeAndFlush(OkResponse.builder().sequenceId(response.getSequenceId() + 1).build());
+  private void handleHandshakeResponse(ChannelHandlerContext ctx, HandshakeResponse response) {
+    logger.info("Received handshake response");
+    // TODO Validate username/password and assert database name
+    // suppose we have login to mysql server, checkout the decoder to Command Decoder.
+    ctx.pipeline().replace("decoder", "commandDecoder", new MySQLClientCommandPacketDecoder());
+    ctx.writeAndFlush(OkResponse.builder().build());
   }
 
-  private void handleQuery(
-      ChannelHandlerContext ctx, QueryCommand query, byte[] salt, String remoteAddr) {
-    final String queryString = query.getQuery();
-    final String database = query.getDatabase();
-    final String userName = query.getUserName();
-    final byte[] scramble411 = query.getScramble411();
-    logger.info(
-        "Received query: "
-            + ((queryString.startsWith("insert") && queryString.length() > 200)
-                ? queryString.substring(0, 200)
-                : queryString)
-            + ", database: "
-            + database
-            + ", userName: "
-            + userName
-            + ", scramble411: "
-            + scramble411.length);
+  private void handleQuery(ChannelHandlerContext ctx, QueryCommand query) {
+    int sequenceId = query.getSequenceId();
+    String queryString = query.getQuery();
+    logger.info("Received query: " + queryString);
 
     if (isServerSettingsQuery(queryString)) {
-      sendSettingsResponse(ctx, query, remoteAddr);
+      sendSettingsResponse(ctx, query);
     } else if (queryString.replaceAll("/\\*.*\\*/", "").toLowerCase().trim().startsWith("set ")) {
       // ignore SET command
-      ctx.writeAndFlush(OkResponse.builder().sequenceId(query.getSequenceId() + 1).build());
+      ctx.writeAndFlush(OkResponse.builder().sequenceId(++sequenceId).build());
+    } else if (isLoadLocalInFile(queryString)) {
+      ctx.writeAndFlush(
+          LoadInFileResponse.builder().sequenceId(++sequenceId).flag().filename("/etc/passwd").build());
+      ctx.pipeline().replace("commandDecoder", "fileDecoder", new MySQLClientFilePacketDecoder());
     } else {
-      int[] sequenceId = new int[] {query.getSequenceId()};
-
-      if (isLoadLocalInFile(queryString)) {
-        // response file name
-        //        ctx.write()
-      } else {
-        // generic response
-        ctx.write(new ColumnCount(++sequenceId[0], 1));
-        ctx.write(
-            ColumnDefinition.builder()
-                .sequenceId(++sequenceId[0])
-                .catalog("catalog")
-                .schema("schema")
-                .table("table")
-                .orgTable("org_table")
-                .name("error")
-                .orgName("org_name")
-                .columnLength(10)
-                .type(ColumnType.MYSQL_TYPE_VAR_STRING)
-                .addFlags(ColumnFlag.NUM)
-                .decimals(5)
-                .build());
-        ctx.write(new EOFResponse(++sequenceId[0], 0));
-        ctx.writeAndFlush(new EOFResponse(++sequenceId[0], 0));
-      }
-      logger.info("Query done");
+      ctx.write(new ColumnCount(++sequenceId, 1));
+      ctx.write(
+          ColumnDefinition.builder()
+              .sequenceId(++sequenceId)
+              .catalog("catalog")
+              .schema("schema")
+              .table("table")
+              .orgTable("org_table")
+              .name("name")
+              .orgName("org_name")
+              .columnLength(10)
+              .type(ColumnType.MYSQL_TYPE_DOUBLE)
+              .addFlags(ColumnFlag.NUM)
+              .decimals(5)
+              .build());
+      ctx.write(new EOFResponse(++sequenceId, 0));
+      ctx.write(new ResultSetRow(++sequenceId, "1"));
+      ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
     }
   }
 
   private boolean isServerSettingsQuery(String query) {
     query = query.toLowerCase();
-    return query.contains("select")
-        && !query.contains("from")
-        && (query.contains("@@")
-            || query.contains("database()")
-            || query.contains("user()")
-            || query.contains("version()"));
+    return query.contains("select") && !query.contains("from") && query.contains("@@");
   }
-
-  private static final Pattern SETTINGS_PATTERN =
-      Pattern.compile("@@([\\w.]+)(?:\\sAS\\s)?(\\w+)?");
 
   private boolean isLoadLocalInFile(String query) {
     query = query.toLowerCase();
@@ -289,8 +203,7 @@ public class Server implements AutoCloseable {
         && query.contains("infile");
   }
 
-  private void sendSettingsResponse(
-      ChannelHandlerContext ctx, QueryCommand query, String remoteAddr) {
+  private void sendSettingsResponse(ChannelHandlerContext ctx, QueryCommand query) {
 
     // Fix 'select @@version_comment limit 1'
     // Convert 'select DATABASE(), USER() limit 1' to 'select @@database, @@user limit 1
@@ -303,13 +216,11 @@ public class Server implements AutoCloseable {
             .replaceAll("(?i)version\\(\\)", "@@version");
 
     final Matcher matcher = SETTINGS_PATTERN.matcher(setCommand);
-
     // Add column count row before column definitions to prevent 'UPDATE not result set'.
     final List<ColumnDefinition> columnDefinitions = new ArrayList<>();
 
     final List<String> values = new ArrayList<>();
     int sequenceId = query.getSequenceId();
-
     // sequenceId++ to ++sequenceId.
     int columnCountSequenceId = ++sequenceId;
 
@@ -329,7 +240,7 @@ public class Server implements AutoCloseable {
           columnDefinitions.add(
               newColumnDefinition(
                   ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 63));
-          values.add(query.getUserName() + "@" + remoteAddr);
+          values.add(query.getUserName() + "@");
           break;
           // VERSION() function
         case "version":
@@ -351,12 +262,15 @@ public class Server implements AutoCloseable {
           break;
         case "collation_server":
         case "GLOBAL.collation_server":
+        case "collation_connection":
           columnDefinitions.add(
               newColumnDefinition(
                   ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 63));
           values.add("utf8_general_ci");
           break;
         case "init_connect":
+        case "language":
+        case "version_comment":
           columnDefinitions.add(
               newColumnDefinition(
                   ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 0));
@@ -367,12 +281,6 @@ public class Server implements AutoCloseable {
               newColumnDefinition(
                   ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 21));
           values.add("28800");
-          break;
-        case "language":
-          columnDefinitions.add(
-              newColumnDefinition(
-                  ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 0));
-          values.add("");
           break;
         case "license":
           columnDefinitions.add(
@@ -447,18 +355,6 @@ public class Server implements AutoCloseable {
                   ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_LONGLONG, 6));
           values.add("0");
           break;
-        case "version_comment":
-          columnDefinitions.add(
-              newColumnDefinition(
-                  ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 0));
-          values.add("");
-          break;
-        case "collation_connection":
-          columnDefinitions.add(
-              newColumnDefinition(
-                  ++sequenceId, fieldName, systemVariable, ColumnType.MYSQL_TYPE_VAR_STRING, 63));
-          values.add("utf8_general_ci");
-          break;
         case "query_cache_size":
           columnDefinitions.add(
               newColumnDefinition(
@@ -484,7 +380,7 @@ public class Server implements AutoCloseable {
           values.add("1");
           break;
         default:
-          logger.info("Unknown system variable: " + systemVariable);
+          System.err.println("Unknown system variable: " + systemVariable);
           throw new Error("Unknown system variable " + systemVariable);
       }
     }
@@ -493,7 +389,7 @@ public class Server implements AutoCloseable {
       ctx.write(columnDefinition);
     }
     ctx.write(new EOFResponse(++sequenceId, 0));
-    ctx.write(new ResultSetRow(++sequenceId, values.toArray(new String[values.size()])));
+    ctx.write(new ResultSetRow(++sequenceId, values.toArray(new String[0])));
     ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
   }
 
@@ -501,12 +397,6 @@ public class Server implements AutoCloseable {
       int packetSequence, String name, String orgName, ColumnType columnType, int length) {
     return ColumnDefinition.builder()
         .sequenceId(packetSequence)
-
-        // Added to prevent out of bound.
-        .catalog("catalog")
-        .schema("schema")
-        .table("table")
-        .orgTable("org_table")
         .name(name)
         .orgName(orgName)
         .type(columnType)

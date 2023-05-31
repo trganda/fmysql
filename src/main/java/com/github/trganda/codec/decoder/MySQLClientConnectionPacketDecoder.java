@@ -12,6 +12,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Decoder for handshake of mysql connection from client
+ */
 public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
     implements MySQLClientPacketDecoder {
 
@@ -49,7 +52,7 @@ public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
 
       if (packet.isReadable()) {
         // username
-        builder.username(CodecUtils.readNullTerminatedString(packet, characterSet.getCharset()));
+        builder.user(CodecUtils.readNullTerminatedString(packet, characterSet.getCharset()));
 
         final EnumSet<CapabilityFlags> serverCapabilities =
             CapabilityFlags.getCapabilitiesAttr(ctx.channel());

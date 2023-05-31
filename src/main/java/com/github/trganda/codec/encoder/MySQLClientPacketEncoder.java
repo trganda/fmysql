@@ -46,7 +46,7 @@ public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientP
         .writeByte(handshakeResponse.getCharacterSet().getId())
         .writeZero(23);
 
-    CodecUtils.writeNullTerminatedString(buf, handshakeResponse.getUsername(), charset);
+    CodecUtils.writeNullTerminatedString(buf, handshakeResponse.getUser(), charset);
 
     if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA)) {
       CodecUtils.writeLengthEncodedInt(

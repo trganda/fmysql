@@ -13,7 +13,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
   private final Set<CapabilityFlags> capabilityFlags = EnumSet.noneOf(CapabilityFlags.class);
   private final int maxPacketSize;
   private final MySQLCharacterSet characterSet;
-  private final String username;
+  private final String user;
   private final String database;
   private String authPluginName;
   private final Map<String, String> attributes = new HashMap<String, String>();
@@ -24,7 +24,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
     this.capabilityFlags.addAll(builder.capabilities);
     this.maxPacketSize = builder.maxPacketSize;
     this.characterSet = builder.characterSet;
-    this.username = builder.username;
+    this.user = builder.user;
     this.database = builder.database;
     this.authPluginName = builder.authPluginName;
     this.attributes.putAll(builder.attributes);
@@ -60,8 +60,8 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
     return characterSet;
   }
 
-  public String getUsername() {
-    return username;
+  public String getUser() {
+    return user;
   }
 
   public String getDatabase() {
@@ -92,7 +92,7 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
   public static class Builder extends AbstractAuthPluginDataBuilder<Builder> {
     private int maxPacketSize = Constants.DEFAULT_MAX_PACKET_SIZE;
     private MySQLCharacterSet characterSet = MySQLCharacterSet.DEFAULT;
-    private String username;
+    private String user;
     private String database;
     private String authPluginName;
     private Map<String, String> attributes = new HashMap<String, String>();
@@ -108,8 +108,8 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
       return this;
     }
 
-    public Builder username(String username) {
-      this.username = username;
+    public Builder user(String username) {
+      this.user = username;
       return this;
     }
 
