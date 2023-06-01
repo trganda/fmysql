@@ -28,10 +28,9 @@ class JDBCClientTest {
 
     private static TestServer server;
 
-    private static int port = 3306;
-
     @BeforeAll
     public static void startServer() {
+        int port = 3306;
         server = new TestServer(port);
     }
 

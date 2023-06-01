@@ -29,8 +29,10 @@ public class SerialTest {
     public void serialTest() throws ClassNotFoundException, SQLException {
         String driver = "com.mysql.cj.jdbc.Driver";
         String DB_URL =
-                "jdbc:mysql://127.0.0.1:3306/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor"; // 8.x使用
+                "jdbc:mysql://127.0.0.1:"
+                        + port
+                        + "/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor";
         Class.forName(driver);
-        Connection conn = DriverManager.getConnection(DB_URL);
+        Connection conn = DriverManager.getConnection(DB_URL, server.getUser(), server.getPassword());
     }
 }

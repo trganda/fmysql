@@ -90,6 +90,7 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
                 .writeShortLE((int) CodecUtils.toLong(handshake.getCapabilities()))
                 .writeByte(handshake.getCharacterSet().getId())
                 .writeShortLE((int) CodecUtils.toLong(handshake.getServerStatus()))
+                // higher two bytes
                 .writeShortLE((int) (CodecUtils.toLong(handshake.getCapabilities()) >> Short.SIZE));
         if (handshake.getCapabilities().contains(CapabilityFlags.CLIENT_PLUGIN_AUTH)) {
             // add 1 reserved byte at the end

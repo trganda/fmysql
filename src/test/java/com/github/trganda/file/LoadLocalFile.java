@@ -14,7 +14,7 @@ public class LoadLocalFile {
 
     private static FakeServer server;
 
-    private static int port = 3306;
+    private static final int port = 3306;
 
     @BeforeAll
     public static void startServer() {

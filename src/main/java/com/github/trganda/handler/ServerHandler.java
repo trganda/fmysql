@@ -4,32 +4,36 @@ import com.github.trganda.codec.auths.Handshake;
 import com.github.trganda.codec.auths.HandshakeResponse;
 import com.github.trganda.codec.constants.*;
 import com.github.trganda.codec.decoder.MySQLClientCommandPacketDecoder;
+import com.github.trganda.codec.decoder.MySQLClientConnectionPacketDecoder;
 import com.github.trganda.codec.decoder.MySQLClientFilePacketDecoder;
 import com.github.trganda.codec.packets.*;
+import com.github.trganda.engine.SQLEngine;
 import com.github.trganda.utils.Utils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.trganda.handler.Constants.VERSION;
+import static com.github.trganda.codec.constants.Constants.DEFAULT_AUTH_PLUGIN_NAME;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
-
     private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\s+AS\\s+(\\w+)");
     /** salt for mysql_native_password plugin */
-    private final byte[] salt = new byte[20];
+    private final byte[] salt;
 
-    public ServerHandler() {
-        new Random().nextBytes(salt);
+    private final SQLEngine sqlEngine;
+
+    public ServerHandler(SQLEngine sqlEngine) {
+        this.salt = Utils.generateRandomAsciiBytes(20);
+        this.sqlEngine = sqlEngine;
     }
 
     @Override
@@ -159,9 +163,48 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     private void handleHandshakeResponse(ChannelHandlerContext ctx, HandshakeResponse response) {
         logger.info("Received handshake response");
         // TODO Validate username/password and assert database name
-        // suppose we have login to mysql server, checkout the decoder to Command Decoder.
-        ctx.pipeline().replace("decoder", "commandDecoder", new MySQLClientCommandPacketDecoder());
-        ctx.writeAndFlush(OkResponse.builder().build());
+
+        int keyLength = response.getAuthPluginData().readableBytes();
+        int sequenceId = response.getSequenceId();
+        String authPluginName = response.getAuthPluginName();
+
+        if (!authPluginName.equals(DEFAULT_AUTH_PLUGIN_NAME)) {
+            // send AuthSwitchRequest
+            logger.info("Send AuthSwitchRequest " + authPluginName);
+            ctx.writeAndFlush(new AuthSwitchRequest(++sequenceId, authPluginName, salt));
+            response.setAuthPluginName(DEFAULT_AUTH_PLUGIN_NAME);
+            MySQLClientConnectionPacketDecoder connPacketDecoder =
+                    (MySQLClientConnectionPacketDecoder) ctx.pipeline().get("decoder");
+            connPacketDecoder.setAuthSwitchStatus(1);
+            return;
+        }
+        byte[] scramble411 = new byte[keyLength];
+        response.getAuthPluginData().readBytes(scramble411);
+
+        try {
+            sqlEngine.authenticate(response.getDatabase(), response.getUser(), scramble411, salt);
+            // suppose we have login to mysql server, checkout the decoder to Command Decoder.
+            ctx.pipeline()
+                    .replace(
+                            "decoder",
+                            "commandDecoder",
+                            new MySQLClientCommandPacketDecoder(
+                                    response.getDatabase(), response.getUser(), scramble411));
+            ctx.writeAndFlush(OkResponse.builder().build());
+        } catch (IOException e) {
+            Throwable cause = e.getCause();
+            int errorCode;
+            byte[] sqlState;
+            String errMsg = Utils.getLocalDateTimeNow() + " " + cause.getMessage();
+            if (cause instanceof IllegalAccessException) {
+                errorCode = 1045;
+                sqlState = "#28000".getBytes(StandardCharsets.US_ASCII);
+            } else {
+                errorCode = 1105;
+                sqlState = "#HY000".getBytes(StandardCharsets.US_ASCII);
+            }
+            ctx.writeAndFlush(new ErrorResponse(response.getSequenceId() + 1, errorCode, sqlState, errMsg));
+        }
     }
 
     private boolean isServerSettingsQuery(String query) {

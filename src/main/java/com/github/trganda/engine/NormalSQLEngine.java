@@ -9,14 +9,17 @@ import java.util.List;
 
 public class NormalSQLEngine implements SQLEngine {
 
-    private String passwd = "passwd";
+    private final String user;
+    private final String passwd;
+
+    public NormalSQLEngine(String user, String passwd) {
+        this.user = user;
+        this.passwd = passwd;
+    }
 
     @Override
     public void authenticate(String database, String userName, byte[] scramble411, byte[] authSeed)
             throws IOException {
-        // Print useful information
-        System.out.println("Database: " + database + ", User: " + userName);
-
         // Check if the password is valid
         authenticateSimply(database, userName, scramble411, authSeed);
     }
@@ -46,11 +49,11 @@ public class NormalSQLEngine implements SQLEngine {
         String validScramble411WithSeed20 = Utils.scramble411(validPasswordSha1, authSeed);
 
         // Use utils to compare the password
-        if (!Utils.compareDigest(
+        if (!userName.equals(user) || !Utils.compareDigest(
                 validScramble411WithSeed20, Base64.getEncoder().encodeToString(scramble411))) {
             // Throw an exception if the checking failed
             throw new IOException(
-                    new IllegalAccessException("Authentication failed: Digest validation failed"));
+                    new IllegalAccessException("Authentication failed: user name or password is incorrect"));
         }
     }
 }
