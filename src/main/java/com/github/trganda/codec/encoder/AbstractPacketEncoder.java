@@ -23,5 +23,5 @@ public abstract class AbstractPacketEncoder<T extends MySQLPacket> extends Messa
     }
 
     protected abstract void encodePacket(ChannelHandlerContext ctx, T packet, ByteBuf buf)
-            throws Exception;
+        throws Exception;
 }

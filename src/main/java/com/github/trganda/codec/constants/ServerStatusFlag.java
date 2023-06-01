@@ -4,7 +4,7 @@ package com.github.trganda.codec.constants;
  * The MySQL client/server capability flags.
  *
  * @see <a href="https://dev.mysql.com/doc/internals/en/status-flags.html">Server Status Flags
- *     Reference Documentation</a>
+ * Reference Documentation</a>
  * or
  * @see <a href="https://dev.mysql.com/doc/dev/mysql-server/latest/mysql__com_8h.html#a1d854e841086925be1883e4d7b4e8cad>Server Status Flags</a>
  */

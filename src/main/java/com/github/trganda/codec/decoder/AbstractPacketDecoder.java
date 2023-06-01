@@ -27,12 +27,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.TooLongFrameException;
+
 import java.nio.charset.Charset;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-/** An abstract decoder for received mysql protocol packet */
+/**
+ * An abstract decoder for received mysql protocol packet
+ */
 public abstract class AbstractPacketDecoder extends ByteToMessageDecoder implements Constants {
 
     private final int maxPacketSize;
@@ -43,7 +46,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
-            throws Exception {
+        throws Exception {
         // size of mysql protocol header is 4
         if (in.isReadable(4)) {
             in.markReaderIndex();
@@ -51,10 +54,10 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
             final int packetSize = in.readUnsignedMediumLE();
             if (packetSize > maxPacketSize) {
                 throw new TooLongFrameException(
-                        "Received a packet of size "
-                                + packetSize
-                                + " but the maximum packet size is "
-                                + maxPacketSize);
+                    "Received a packet of size "
+                        + packetSize
+                        + " but the maximum packet size is "
+                        + maxPacketSize);
             }
             // sequence id
             final int sequenceId = in.readByte();
@@ -71,25 +74,25 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
     /**
      * Decode the payload of mysql packet
      *
-     * @param ctx channel context
+     * @param ctx        channel context
      * @param sequenceId sequence id of packet
-     * @param packet packet payload buffer
-     * @param out output object list
+     * @param packet     packet payload buffer
+     * @param out        output object list
      */
     protected abstract void decodePayload(
-            ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out);
+        ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out);
 
     protected OkResponse decodeOkResponse(
-            int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities, Charset charset) {
+        int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities, Charset charset) {
 
         final OkResponse.Builder builder =
-                OkResponse.builder()
-                        .sequenceId(sequenceId)
-                        .affectedRows(CodecUtils.readLengthEncodedInteger(packet))
-                        .lastInsertId(CodecUtils.readLengthEncodedInteger(packet));
+            OkResponse.builder()
+                .sequenceId(sequenceId)
+                .affectedRows(CodecUtils.readLengthEncodedInteger(packet))
+                .lastInsertId(CodecUtils.readLengthEncodedInteger(packet));
 
         final EnumSet<ServerStatusFlag> statusFlags =
-                CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class);
+            CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class);
         if (capabilities.contains(CapabilityFlags.CLIENT_PROTOCOL_41)) {
             builder.addStatusFlags(statusFlags).warnings(packet.readUnsignedShortLE());
         } else if (capabilities.contains(CapabilityFlags.CLIENT_TRANSACTIONS)) {
@@ -108,12 +111,12 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
     }
 
     protected EOFResponse decodeEOFResponse(
-            int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities) {
+        int sequenceId, ByteBuf packet, Set<CapabilityFlags> capabilities) {
         if (capabilities.contains(CapabilityFlags.CLIENT_PROTOCOL_41)) {
             return new EOFResponse(
-                    sequenceId,
-                    packet.readUnsignedShortLE(),
-                    CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class));
+                sequenceId,
+                packet.readUnsignedShortLE(),
+                CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class));
         } else {
             return new EOFResponse(sequenceId, 0);
         }
@@ -127,7 +130,7 @@ public abstract class AbstractPacketDecoder extends ByteToMessageDecoder impleme
         packet.readBytes(sqlState);
 
         final String message =
-                CodecUtils.readFixedLengthString(packet, packet.readableBytes(), charset);
+            CodecUtils.readFixedLengthString(packet, packet.readableBytes(), charset);
 
         return new ErrorResponse(sequenceId, errorNumber, sqlState, message);
     }

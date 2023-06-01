@@ -2,6 +2,7 @@ package com.github.trganda.codec.constants;
 
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
+
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
@@ -168,9 +169,9 @@ public enum MySQLCharacterSet {
     }
 
     private static final AttributeKey<MySQLCharacterSet> SERVER_CHARSET_KEY =
-            AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-server");
+        AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-server");
     private static final AttributeKey<MySQLCharacterSet> CLIENT_CHARSET_KEY =
-            AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-client");
+        AttributeKey.newInstance(MySQLCharacterSet.class.getName() + "-client");
 
     public static MySQLCharacterSet getServerCharsetAttr(Channel channel) {
         return getCharSetAttr(SERVER_CHARSET_KEY, channel);
@@ -181,7 +182,7 @@ public enum MySQLCharacterSet {
     }
 
     private static MySQLCharacterSet getCharSetAttr(
-            AttributeKey<MySQLCharacterSet> key, Channel channel) {
+        AttributeKey<MySQLCharacterSet> key, Channel channel) {
         if (channel.hasAttr(key)) {
             return channel.attr(key).get();
         }

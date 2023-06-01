@@ -2,13 +2,14 @@ package com.github.trganda.codec.encoder;
 
 import com.github.trganda.codec.CodecUtils;
 import com.github.trganda.codec.auths.HandshakeResponse;
-import com.github.trganda.codec.packets.QueryCommand;
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.packets.CommandPacket;
 import com.github.trganda.codec.packets.MySQLClientPacket;
+import com.github.trganda.codec.packets.QueryCommand;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+
 import java.nio.charset.Charset;
 import java.util.Set;
 
@@ -16,10 +17,10 @@ public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientP
 
     @Override
     protected void encodePacket(ChannelHandlerContext ctx, MySQLClientPacket packet, ByteBuf buf)
-            throws Exception {
+        throws Exception {
         final Charset charset = MySQLCharacterSet.getClientCharsetAttr(ctx.channel()).getCharset();
         final Set<CapabilityFlags> capabilities =
-                CapabilityFlags.getCapabilitiesAttr(ctx.channel());
+            CapabilityFlags.getCapabilitiesAttr(ctx.channel());
         if (packet instanceof CommandPacket) {
             encodeCommandPacket((CommandPacket) packet, buf, charset);
         } else if (packet instanceof HandshakeResponse) {
@@ -38,20 +39,20 @@ public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientP
     }
 
     private void encodeHandshakeResponse(
-            HandshakeResponse handshakeResponse,
-            ByteBuf buf,
-            Charset charset,
-            Set<CapabilityFlags> capabilities) {
+        HandshakeResponse handshakeResponse,
+        ByteBuf buf,
+        Charset charset,
+        Set<CapabilityFlags> capabilities) {
         buf.writeIntLE((int) CodecUtils.toLong(handshakeResponse.getCapabilityFlags()))
-                .writeIntLE(handshakeResponse.getMaxPacketSize())
-                .writeByte(handshakeResponse.getCharacterSet().getId())
-                .writeZero(23);
+            .writeIntLE(handshakeResponse.getMaxPacketSize())
+            .writeByte(handshakeResponse.getCharacterSet().getId())
+            .writeZero(23);
 
         CodecUtils.writeNullTerminatedString(buf, handshakeResponse.getUser(), charset);
 
         if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA)) {
             CodecUtils.writeLengthEncodedInt(
-                    buf, (long) handshakeResponse.getAuthPluginData().writableBytes());
+                buf, (long) handshakeResponse.getAuthPluginData().writableBytes());
             buf.writeBytes(handshakeResponse.getAuthPluginData());
         } else if (capabilities.contains(CapabilityFlags.CLIENT_RESERVED2)) {
             buf.writeByte(handshakeResponse.getAuthPluginData().readableBytes());
@@ -67,17 +68,17 @@ public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientP
 
         if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH)) {
             CodecUtils.writeNullTerminatedString(
-                    buf, handshakeResponse.getAuthPluginName(), charset);
+                buf, handshakeResponse.getAuthPluginName(), charset);
         }
         if (capabilities.contains(CapabilityFlags.CLIENT_CONNECT_ATTRS)) {
             CodecUtils.writeLengthEncodedInt(buf, (long) handshakeResponse.getAttributes().size());
             handshakeResponse
-                    .getAttributes()
-                    .forEach(
-                            (key, value) -> {
-                                CodecUtils.writeLengthEncodedString(buf, key, charset);
-                                CodecUtils.writeLengthEncodedString(buf, value, charset);
-                            });
+                .getAttributes()
+                .forEach(
+                    (key, value) -> {
+                        CodecUtils.writeLengthEncodedString(buf, key, charset);
+                        CodecUtils.writeLengthEncodedString(buf, value, charset);
+                    });
         }
     }
 }

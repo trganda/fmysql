@@ -1,7 +1,6 @@
 package com.github.trganda.codec.packets;
 
 import com.github.trganda.codec.constants.Command;
-import com.github.trganda.codec.packets.CommandPacket;
 
 public class QueryCommand extends CommandPacket {
 
@@ -11,7 +10,7 @@ public class QueryCommand extends CommandPacket {
     private final byte[] scramble411;
 
     public QueryCommand(
-            int sequenceId, String query, String database, String userName, byte[] scramble411) {
+        int sequenceId, String query, String database, String userName, byte[] scramble411) {
         super(sequenceId, Command.COM_QUERY);
         this.query = query;
         this.database = database;

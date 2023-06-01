@@ -16,13 +16,16 @@
 
 package com.github.trganda.engine;
 
-/** A column of the result */
+/**
+ * A column of the result
+ */
 public class QueryResultColumn {
 
     private String name;
     private String type;
 
-    public QueryResultColumn() {}
+    public QueryResultColumn() {
+    }
 
     public QueryResultColumn(String name, String type) {
         this.name = name;

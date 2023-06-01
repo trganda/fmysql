@@ -11,12 +11,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.CharsetUtil;
+
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 
 public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder
-        implements MySQLServerPacketDecoder {
+    implements MySQLServerPacketDecoder {
 
     public MySQLServerConnectionPacketDecoder() {
         this(DEFAULT_MAX_PACKET_SIZE);
@@ -28,7 +29,7 @@ public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder
 
     @Override
     protected void decodePayload(
-            ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
+        ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
         final Channel channel = ctx.channel();
         final Set<CapabilityFlags> capabilities = CapabilityFlags.getCapabilitiesAttr(channel);
         final Charset serverCharset = MySQLCharacterSet.getServerCharsetAttr(channel).getCharset();
@@ -69,37 +70,37 @@ public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder
 
         final Handshake.Builder builder = Handshake.builder();
         builder.protocolVersion(protocolVersion)
-                .serverVersion(CodecUtils.readNullTerminatedString(packet))
-                .connectionId(packet.readIntLE())
-                .addAuthData(packet, Constants.AUTH_PLUGIN_DATA_PART1_LEN);
+            .serverVersion(CodecUtils.readNullTerminatedString(packet))
+            .connectionId(packet.readIntLE())
+            .addAuthData(packet, Constants.AUTH_PLUGIN_DATA_PART1_LEN);
 
         packet.skipBytes(1); // Skip auth plugin data terminator
         builder.addCapabilities(
-                CodecUtils.toEnumSet(CapabilityFlags.class, packet.readUnsignedShortLE()));
+            CodecUtils.toEnumSet(CapabilityFlags.class, packet.readUnsignedShortLE()));
         if (packet.isReadable()) {
             builder.characterSet(MySQLCharacterSet.findById(packet.readByte()))
-                    .addServerStatus(CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class))
-                    .addCapabilities(
-                            CodecUtils.toEnumSet(
-                                    CapabilityFlags.class,
-                                    packet.readUnsignedShortLE() << Short.SIZE));
+                .addServerStatus(CodecUtils.readShortEnumSet(packet, ServerStatusFlag.class))
+                .addCapabilities(
+                    CodecUtils.toEnumSet(
+                        CapabilityFlags.class,
+                        packet.readUnsignedShortLE() << Short.SIZE));
             if (builder.hasCapability(CapabilityFlags.CLIENT_RESERVED2)) {
                 final int authDataLen = packet.readByte();
 
                 packet.skipBytes(Constants.HANDSHAKE_RESERVED_BYTES); // Skip reserved bytes
                 final int readableBytes =
-                        Math.max(
-                                Constants.AUTH_PLUGIN_DATA_PART2_MIN_LEN,
-                                authDataLen - Constants.AUTH_PLUGIN_DATA_PART1_LEN);
+                    Math.max(
+                        Constants.AUTH_PLUGIN_DATA_PART2_MIN_LEN,
+                        authDataLen - Constants.AUTH_PLUGIN_DATA_PART1_LEN);
                 builder.addAuthData(packet, readableBytes);
                 if (builder.hasCapability(CapabilityFlags.CLIENT_PLUGIN_AUTH)
-                        && packet.isReadable()) {
+                    && packet.isReadable()) {
                     int len = packet.readableBytes();
                     if (packet.getByte(packet.readerIndex() + len - 1) == 0) {
                         len--;
                     }
                     builder.authPluginName(
-                            CodecUtils.readFixedLengthString(packet, len, CharsetUtil.UTF_8));
+                        CodecUtils.readFixedLengthString(packet, len, CharsetUtil.UTF_8));
                     packet.skipBytes(1);
                 }
             }

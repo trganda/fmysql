@@ -6,6 +6,7 @@ import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.packets.MySQLClientPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.DefaultByteBufHolder;
+
 import java.util.*;
 
 public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClientPacket {
@@ -35,12 +36,12 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
     }
 
     public static HandshakeResponse createSslResponse(
-            Set<CapabilityFlags> capabilities, int maxPacketSize, MySQLCharacterSet characterSet) {
+        Set<CapabilityFlags> capabilities, int maxPacketSize, MySQLCharacterSet characterSet) {
         return create().maxPacketSize(maxPacketSize)
-                .characterSet(characterSet)
-                .addCapabilities(capabilities)
-                .addCapabilities(CapabilityFlags.CLIENT_SSL)
-                .build();
+            .characterSet(characterSet)
+            .addCapabilities(capabilities)
+            .addCapabilities(CapabilityFlags.CLIENT_SSL)
+            .build();
     }
 
     public ByteBuf getAuthPluginData() {

@@ -3,6 +3,7 @@ package com.github.trganda.codec.packets;
 import com.github.trganda.codec.MySQLServerPacketVisitor;
 import com.github.trganda.codec.constants.ServerStatusFlag;
 import io.netty.channel.ChannelHandlerContext;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -87,7 +88,7 @@ public class OkResponse extends AbstractMySQLPacket implements MySQLServerPacket
         }
 
         public Builder addStatusFlags(
-                ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
+            ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
             this.statusFlags.add(statusFlag);
             Collections.addAll(this.statusFlags, statusFlags);
             return this;

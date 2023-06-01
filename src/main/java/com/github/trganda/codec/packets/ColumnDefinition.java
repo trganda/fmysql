@@ -10,17 +10,29 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServerPacket {
-    /** Catalog used, always "def" */
+    /**
+     * Catalog used, always "def"
+     */
     private final String catalog;
-    /** Schema (e.g. database) name */
+    /**
+     * Schema (e.g. database) name
+     */
     private final String schema;
-    /** Virtual Table name */
+    /**
+     * Virtual Table name
+     */
     private final String table;
-    /** Physical Table name */
+    /**
+     * Physical Table name
+     */
     private final String orgTable;
-    /** Virtual Column name */
+    /**
+     * Virtual Column name
+     */
     private final String name;
-    /** Physical Column name */
+    /**
+     * Physical Column name
+     */
     private final String orgName;
     /**
      * Column character as defined in
@@ -28,7 +40,9 @@ public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServer
      * @see MySQLCharacterSet
      */
     private final MySQLCharacterSet characterSet;
-    /** Maximum length of this field type */
+    /**
+     * Maximum length of this field type
+     */
     private final long columnLength;
     /**
      * Type of the Column as defined in ColumnType

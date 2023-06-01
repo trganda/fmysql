@@ -16,13 +16,14 @@
 
 package com.github.trganda;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.*;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 class JDBCClientTest {
 
@@ -44,10 +45,10 @@ class JDBCClientTest {
         // Raise a connection to the servers
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection conn =
-                DriverManager.getConnection(
-                        "jdbc:mysql://localhost:" + server.getPort() + "/test",
-                        server.getUser(),
-                        server.getPassword())) {
+                 DriverManager.getConnection(
+                     "jdbc:mysql://localhost:" + server.getPort() + "/test",
+                     server.getUser(),
+                     server.getPassword())) {
             try (Statement statement = conn.createStatement()) {
                 try (ResultSet rs = statement.executeQuery("SELECT 1")) {
                     while (rs.next()) {
