@@ -19,9 +19,16 @@ public enum ColumnFlag {
     AUTO_INCREMENT(0x200),
     TIMESTAMP(0x400),
     SET(0x800),
-    NUM(0x8000),
     NO_DEFAULT_VALUE(0x1000),
-    BIT(-7);
+    ON_UPDATE_NOW(0x2000),
+    PART_KEY(0x4000),
+    NUM(0x8000),
+    GROUP(0x8000),
+    UNIQUE(0x10000),
+    BINCMP(0x20000),
+    GET_FIXED_FIELDS(0x40000),
+    FIELD_IN_PART_FUNC(0x80000),
+    FIELD_IN_ADD_INDEX(0x100000);
     private final int value;
 
     ColumnFlag(int val) {

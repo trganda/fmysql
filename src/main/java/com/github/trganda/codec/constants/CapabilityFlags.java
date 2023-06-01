@@ -10,7 +10,7 @@ import java.util.Set;
  * An enum of all the MySQL client/server capability flags.
  *
  * @see <a
- *     href="https://dev.mysql.com/doc/internals/en/capability-flags.html#packet-Protocol::CapabilityFlags">
+ *     href="https://dev.mysql.com/doc/dev/mysql-server/latest/group__group__cs__capabilities__flags.html">
  *     Capability Flags Reference Documentation</a>
  */
 public enum CapabilityFlags {
