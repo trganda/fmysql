@@ -88,6 +88,8 @@ public enum CapabilityFlags {
                 CapabilityFlags.CLIENT_PROTOCOL_41,
                 CapabilityFlags.CLIENT_TRANSACTIONS,
                 CapabilityFlags.CLIENT_CONNECT_WITH_DB,
+                CapabilityFlags.CLIENT_RESERVED2,
+                CapabilityFlags.CLIENT_LOCAL_FILES,
                 CapabilityFlags.CLIENT_PLUGIN_AUTH,
                 CapabilityFlags.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA);
     }
