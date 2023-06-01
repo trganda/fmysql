@@ -5,7 +5,7 @@ package com.github.trganda.codec.packets;
  */
 abstract class AbstractMySQLPacket implements MySQLPacket {
 
-    private final int sequenceId;
+    protected final int sequenceId;
 
     public AbstractMySQLPacket(int sequenceId) {
         this.sequenceId = sequenceId;

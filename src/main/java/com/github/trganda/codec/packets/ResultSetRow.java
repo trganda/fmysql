@@ -18,6 +18,14 @@ public class ResultSetRow extends AbstractMySQLPacket implements MySQLServerPack
         this.values.addAll(values);
     }
 
+    public void addValues(Object... values) {
+        Collections.addAll(this.values, values);
+    }
+
+    public void addValues(Collection<Object> values) {
+        this.values.addAll(values);
+    }
+
     public List<Object> getValues() {
         return values;
     }
