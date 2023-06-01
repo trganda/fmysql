@@ -16,46 +16,46 @@
 
 package com.github.trganda;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.*;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 class JDBCClientTest {
 
-  private static TestServer server;
+    private static TestServer server;
 
-  private static int port = 3306;
-
-  @BeforeAll
-  public static void startServer() {
-    server = new TestServer(port);
-  }
-
-  @AfterAll
-  public static void stopServer() {
-    server.close();
-  }
-
-  @Test
-  void selfConnect() throws Exception {
-    // Raise a connection to the servers
-    Class.forName("com.mysql.cj.jdbc.Driver");
-    try (Connection conn =
-        DriverManager.getConnection(
-            "jdbc:mysql://localhost:" + server.getPort() + "/test",
-            server.getUser(),
-            server.getPassword())) {
-      try (Statement statement = conn.createStatement()) {
-        try (ResultSet rs = statement.executeQuery("SELECT 1")) {
-          while (rs.next()) {
-            System.out.println(rs.getString(1));
-          }
-        }
-      }
+    @BeforeAll
+    public static void startServer() {
+        int port = 3306;
+        server = new TestServer(port);
     }
-  }
+
+    @AfterAll
+    public static void stopServer() {
+        server.close();
+    }
+
+    @Test
+    void selfConnect() throws Exception {
+        // Raise a connection to the servers
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection conn =
+                 DriverManager.getConnection(
+                     "jdbc:mysql://localhost:" + server.getPort() + "/test",
+                     server.getUser(),
+                     server.getPassword())) {
+            try (Statement statement = conn.createStatement()) {
+                try (ResultSet rs = statement.executeQuery("SELECT 1")) {
+                    while (rs.next()) {
+                        System.out.println(rs.getString(1));
+                    }
+                }
+            }
+        }
+    }
 }
