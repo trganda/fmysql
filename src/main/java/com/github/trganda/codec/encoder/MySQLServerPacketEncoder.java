@@ -160,8 +160,13 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
   }
 
   protected void encodeResultSetRow(Charset serverCharset, ResultSetRow packet, ByteBuf buf) {
-    for (String value : packet.getValues()) {
-      CodecUtils.writeLengthEncodedString(buf, value, serverCharset);
+    for (Object value : packet.getValues()) {
+      if (value instanceof String) {
+        CodecUtils.writeLengthEncodedString(buf, (String) value, serverCharset);
+      } else if (value instanceof byte[]) {
+        CodecUtils.writeLengthEncodedInt(buf, (long) ((byte[]) value).length);
+        buf.writeBytes((byte[]) value);
+      }
     }
   }
 

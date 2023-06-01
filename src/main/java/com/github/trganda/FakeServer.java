@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 public class FakeServer implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(FakeServer.class);
-  private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\sAS\\s(\\w+)");
+  private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\s+AS\\s+(\\w+)");
   private static final String VERSION = "5.3.1";
   private final int port;
   private final String user = "user";
@@ -166,26 +166,49 @@ public class FakeServer implements AutoCloseable {
       ctx.writeAndFlush(OkResponse.builder().sequenceId(++sequenceId).build());
     } else if (isLoadLocalInFile(queryString)) {
       ctx.writeAndFlush(
-          LoadInFileResponse.builder().sequenceId(++sequenceId).flag().filename("/etc/passwd").build());
+          LoadInFileResponse.builder()
+              .sequenceId(++sequenceId)
+              .flag()
+              .filename("/etc/passwd")
+              .build());
       ctx.pipeline().replace("commandDecoder", "fileDecoder", new MySQLClientFilePacketDecoder());
     } else {
-      ctx.write(new ColumnCount(++sequenceId, 1));
-      ctx.write(
+      final List<ColumnDefinition> columnDefinitions = new ArrayList<>();
+      columnDefinitions.add(
           ColumnDefinition.builder()
               .sequenceId(++sequenceId)
-              .catalog("catalog")
+              .catalog("def")
               .schema("schema")
-              .table("table")
-              .orgTable("org_table")
-              .name("name")
-              .orgName("org_name")
-              .columnLength(10)
-              .type(ColumnType.MYSQL_TYPE_MEDIUM_BLOB)
+              .table("session_status")
+              .orgTable("session_status")
+              .name("Variable_name")
+              .orgName("Variable_name")
+              .columnLength(65 * 1024)
+              .characterSet(MySQLCharacterSet.BINARY)
+              .type(ColumnType.MYSQL_TYPE_BIT)
               .addFlags(ColumnFlag.BLOB)
-              .decimals(5)
+              .decimals(0x00)
               .build());
+      columnDefinitions.add(
+          ColumnDefinition.builder()
+              .sequenceId(++sequenceId)
+              .catalog("def")
+              .schema("schema")
+              .table("session_status")
+              .orgTable("session_status")
+              .name("Value")
+              .orgName("Value")
+              .columnLength(63)
+              .type(ColumnType.MYSQL_TYPE_VAR_STRING)
+              .addFlags(ColumnFlag.BLOB)
+              .decimals(0x00)
+              .build());
+      ctx.write(new ColumnCount(++sequenceId, columnDefinitions.size()));
+      for (ColumnDefinition columnDefinition : columnDefinitions) {
+        ctx.write(columnDefinition);
+      }
       ctx.write(new EOFResponse(++sequenceId, 0));
-      ctx.write(new ResultSetRow(++sequenceId, Utils.payload("cc5.bin")));
+      ctx.write(new ResultSetRow(++sequenceId, Utils.payload("cc5.bin"), "1"));
       ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
     }
   }
@@ -396,11 +419,16 @@ public class FakeServer implements AutoCloseable {
   private ColumnDefinition newColumnDefinition(
       int packetSequence, String name, String orgName, ColumnType columnType, int length) {
     return ColumnDefinition.builder()
+        .catalog("def")
+        .schema("")
+        .table("")
+        .orgTable("")
         .sequenceId(packetSequence)
         .name(name)
         .orgName(orgName)
         .type(columnType)
         .columnLength(length)
+        .decimals(0x00)
         .build();
   }
 }

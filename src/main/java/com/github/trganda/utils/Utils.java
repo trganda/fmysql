@@ -84,18 +84,18 @@ public final class Utils {
     return Base64.getEncoder().encodeToString(toBeXord);
   }
 
-  public static String payload(String name) {
+  public static byte[] payload(String name) {
     try (InputStream fis = Utils.class.getClassLoader().getResourceAsStream(name);) {
       assert fis != null;
       byte[] bytes = new byte[fis.available()];
       int cnt = fis.read(bytes);
       if (cnt == -1) {
-        return "";
+        return new byte[0];
       }
-      return new String(bytes, StandardCharsets.US_ASCII);
+      return bytes;
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
-      return "";
+      return new byte[0];
     }
   }
 }
