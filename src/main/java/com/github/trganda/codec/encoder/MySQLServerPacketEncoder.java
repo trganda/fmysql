@@ -101,7 +101,7 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
             buf.writeByte(Constants.NUL_BYTE);
         }
         buf.writeZero(Constants.HANDSHAKE_RESERVED_BYTES);
-        if (handshake.getCapabilities().contains(CapabilityFlags.CLIENT_SECURE_CONNECTION)) {
+        if (handshake.getCapabilities().contains(CapabilityFlags.CLIENT_RESERVED2)) {
             final int padding =
                     Constants.AUTH_PLUGIN_DATA_PART2_MIN_LEN
                             - handshake.getAuthPluginData().readableBytes();

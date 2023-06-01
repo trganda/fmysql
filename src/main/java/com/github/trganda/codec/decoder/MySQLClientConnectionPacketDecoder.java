@@ -62,7 +62,7 @@ public class MySQLClientConnectionPacketDecoder extends AbstractPacketDecoder
                 final int authResponseLength;
                 if (capabilities.contains(CapabilityFlags.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA)) {
                     authResponseLength = (int) CodecUtils.readLengthEncodedInteger(packet);
-                } else if (capabilities.contains(CapabilityFlags.CLIENT_SECURE_CONNECTION)) {
+                } else if (capabilities.contains(CapabilityFlags.CLIENT_RESERVED2)) {
                     authResponseLength = packet.readUnsignedByte();
                 } else {
                     authResponseLength = CodecUtils.findNullTermLen(packet);

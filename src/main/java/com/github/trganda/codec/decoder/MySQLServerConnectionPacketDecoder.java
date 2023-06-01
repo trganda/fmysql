@@ -83,7 +83,7 @@ public class MySQLServerConnectionPacketDecoder extends AbstractPacketDecoder
                             CodecUtils.toEnumSet(
                                     CapabilityFlags.class,
                                     packet.readUnsignedShortLE() << Short.SIZE));
-            if (builder.hasCapability(CapabilityFlags.CLIENT_SECURE_CONNECTION)) {
+            if (builder.hasCapability(CapabilityFlags.CLIENT_RESERVED2)) {
                 final int authDataLen = packet.readByte();
 
                 packet.skipBytes(Constants.HANDSHAKE_RESERVED_BYTES); // Skip reserved bytes

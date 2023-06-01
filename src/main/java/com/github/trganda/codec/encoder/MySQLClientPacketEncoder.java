@@ -53,7 +53,7 @@ public class MySQLClientPacketEncoder extends AbstractPacketEncoder<MySQLClientP
             CodecUtils.writeLengthEncodedInt(
                     buf, (long) handshakeResponse.getAuthPluginData().writableBytes());
             buf.writeBytes(handshakeResponse.getAuthPluginData());
-        } else if (capabilities.contains(CapabilityFlags.CLIENT_SECURE_CONNECTION)) {
+        } else if (capabilities.contains(CapabilityFlags.CLIENT_RESERVED2)) {
             buf.writeByte(handshakeResponse.getAuthPluginData().readableBytes());
             buf.writeBytes(handshakeResponse.getAuthPluginData());
         } else {

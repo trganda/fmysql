@@ -34,4 +34,8 @@ public enum ColumnFlag {
     ColumnFlag(int val) {
         this.value = val;
     }
+
+    public int getValue() {
+        return value;
+    }
 }
