@@ -2,15 +2,15 @@ package com.github.trganda.codec;
 
 // TODO add parameters
 public interface RowsChangedVisitor {
-  void columnAddedRow();
+    void columnAddedRow();
 
-  void endAddedRow();
+    void endAddedRow();
 
-  void columnDeletedRow();
+    void columnDeletedRow();
 
-  void endDeletedRow();
+    void endDeletedRow();
 
-  void columnUpdatedRow();
+    void columnUpdatedRow();
 
-  void endUpdatedRow();
+    void endUpdatedRow();
 }

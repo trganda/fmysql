@@ -11,26 +11,26 @@ import java.sql.SQLException;
 
 public class SerialTest {
 
-  private static FakeServer server;
+    private static FakeServer server;
 
-  private static int port = 3306;
+    private static int port = 3306;
 
-  @BeforeAll
-  public static void startServer() {
-    server = new FakeServer(port);
-  }
+    @BeforeAll
+    public static void startServer() {
+        server = new FakeServer(port);
+    }
 
-  @AfterAll
-  public static void stopServer() {
-    server.close();
-  }
+    @AfterAll
+    public static void stopServer() {
+        server.close();
+    }
 
-  @Test
-  public void serialTest() throws ClassNotFoundException, SQLException {
-    String driver = "com.mysql.cj.jdbc.Driver";
-    String DB_URL =
-        "jdbc:mysql://127.0.0.1:3306/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor"; // 8.x使用
-    Class.forName(driver);
-    Connection conn = DriverManager.getConnection(DB_URL);
-  }
+    @Test
+    public void serialTest() throws ClassNotFoundException, SQLException {
+        String driver = "com.mysql.cj.jdbc.Driver";
+        String DB_URL =
+                "jdbc:mysql://127.0.0.1:3306/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor"; // 8.x使用
+        Class.forName(driver);
+        Connection conn = DriverManager.getConnection(DB_URL);
+    }
 }

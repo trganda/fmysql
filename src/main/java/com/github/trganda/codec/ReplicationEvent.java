@@ -4,12 +4,12 @@ import com.github.trganda.codec.packets.ReplicationEventHeader;
 import io.netty.channel.ChannelHandlerContext;
 
 public interface ReplicationEvent extends Visitable {
-  ReplicationEventHeader header();
+    ReplicationEventHeader header();
 
-  ReplicationEventPayload payload();
+    ReplicationEventPayload payload();
 
-  @Override
-  default void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
-    visitor.visit(this, ctx);
-  }
+    @Override
+    default void accept(MySQLServerPacketVisitor visitor, ChannelHandlerContext ctx) {
+        visitor.visit(this, ctx);
+    }
 }
