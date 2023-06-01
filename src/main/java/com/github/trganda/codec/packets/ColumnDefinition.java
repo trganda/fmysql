@@ -10,16 +10,42 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServerPacket {
+    /** Catalog used, always "def" */
     private final String catalog;
+    /** Schema (e.g. database) name */
     private final String schema;
+    /** Virtual Table name */
     private final String table;
+    /** Physical Table name */
     private final String orgTable;
+    /** Virtual Column name */
     private final String name;
+    /** Physical Column name */
     private final String orgName;
+    /**
+     * Column character as defined in
+     *
+     * @see MySQLCharacterSet
+     */
     private final MySQLCharacterSet characterSet;
+    /** Maximum length of this field type */
     private final long columnLength;
+    /**
+     * Type of the Column as defined in ColumnType
+     *
+     * @see ColumnType
+     */
     private final ColumnType type;
+    /**
+     * Flags as defined in ColumnFlag
+     *
+     * @see ColumnFlag
+     */
     private final Set<ColumnFlag> flags = EnumSet.noneOf(ColumnFlag.class);
+    /**
+     * Max shown decimal digits for this Column type: - 0x00 for integers and static strings - 0x1f
+     * for dynamic strings, double, float - 0x00 to 0x51 for decimals
+     */
     private final int decimals;
 
     private ColumnDefinition(Builder builder) {
@@ -155,7 +181,7 @@ public class ColumnDefinition extends AbstractMySQLPacket implements MySQLServer
         }
 
         public Builder addFlags(Collection<ColumnFlag> flags) {
-            flags.addAll(flags);
+            this.flags.addAll(flags);
             return this;
         }
 
