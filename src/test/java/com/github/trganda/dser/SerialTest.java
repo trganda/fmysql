@@ -27,12 +27,21 @@ public class SerialTest {
     }
 
     @Test
-    public void serialTest() throws ClassNotFoundException, SQLException {
+    public void serialTest8012() throws ClassNotFoundException, SQLException {
         String driver = "com.mysql.cj.jdbc.Driver";
         String DB_URL =
                 "jdbc:mysql://127.0.0.1:"
                         + port
                         + "/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor";
+        Class.forName(driver);
+        Connection conn =
+                DriverManager.getConnection(DB_URL, server.getUser(), server.getPassword());
+    }
+
+    @Test
+    public void serialTest5128() throws ClassNotFoundException, SQLException {
+        String driver = "com.mysql.jdbc.Driver";
+        String DB_URL = "jdbc:mysql://127.0.0.1:" + port + "/test?autoDeserialize=true";
         Class.forName(driver);
         Connection conn =
                 DriverManager.getConnection(DB_URL, server.getUser(), server.getPassword());

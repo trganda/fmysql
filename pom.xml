@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <netty.version>4.1.86.Final</netty.version>
-        <mysql.version>8.0.11</mysql.version>
+        <mysql.version>5.1.19</mysql.version>
     </properties>
 
     <dependencies>

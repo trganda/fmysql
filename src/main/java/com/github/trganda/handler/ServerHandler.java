@@ -29,7 +29,8 @@ import java.util.regex.Pattern;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
-    private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\s+AS\\s+(\\w+)");
+    private static final Pattern SETTINGS_PATTERN =
+            Pattern.compile("@@([\\w\\.]+)(\\s+AS\\s+)?([\\w\\.]*)");
     /** salt for mysql_native_password plugin */
     private final byte[] salt;
 
@@ -85,16 +86,16 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                     ctx.close();
                 } else if (command.equals(Command.COM_INIT_DB)
                         || command.equals(Command.COM_PING)) {
-                    ctx.writeAndFlush(OkResponse.builder().sequenceId(sequenceId + 1).build());
+                    ctx.writeAndFlush(OkResponse.builder().sequenceId(++sequenceId).build());
                 } else if (command.equals(Command.COM_FIELD_LIST)) {
-                    ctx.writeAndFlush(new EOFResponse(sequenceId + 1, 0));
+                    ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
                 } else if (command.equals(Command.COM_STATISTICS)) {
                     String statString =
                             "Uptime: "
                                     + Utils.getJVMUptime()
                                     + "  "
                                     + "Hack Code: ..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o";
-                    ctx.writeAndFlush(new StatisticsResponse(sequenceId + 1, statString));
+                    ctx.writeAndFlush(new StatisticsResponse(++sequenceId, statString));
                 }
             }
         }
@@ -123,7 +124,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                             .build());
             ctx.pipeline()
                     .replace("commandDecoder", "fileDecoder", new MySQLClientFilePacketDecoder());
-        } else {
+        } else if (queryString.equalsIgnoreCase("SHOW SESSION STATUS")) {
             ColumnFactory columnFactory =
                     new ColumnFactory(++sequenceId, "def", "", "session_status");
             columnFactory.addColumnDefinition(
@@ -142,6 +143,44 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             }
             ctx.write(new EOFResponse(++sequenceId, 0));
             ctx.write(new ResultSetRow(++sequenceId, Utils.payload("cc5.bin"), "1"));
+            ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
+        } else if (queryString.equalsIgnoreCase("SHOW COLLATION")) {
+            ColumnFactory columnFactory =
+                    new ColumnFactory(++sequenceId, "def", "", "session_status");
+            columnFactory.addColumnDefinition(
+                    "1",
+                    MySQLCharacterSet.UTF8_GENERAL_CI,
+                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                    ColumnFlag.BLOB);
+            columnFactory.addColumnDefinition(
+                    "2", MySQLCharacterSet.BINARY, ColumnType.MYSQL_TYPE_BIT, ColumnFlag.BLOB);
+            columnFactory.addColumnDefinition(
+                    "3", MySQLCharacterSet.BINARY, ColumnType.MYSQL_TYPE_BIT, ColumnFlag.BLOB);
+
+            ctx.write(new ColumnCount(++sequenceId, columnFactory.getColumnDefinitions().size()));
+            for (ColumnDefinition columnDefinition : columnFactory.getColumnDefinitions()) {
+                ctx.write(columnDefinition);
+            }
+            ctx.write(new EOFResponse(++sequenceId, 0));
+            ctx.write(new ResultSetRow(++sequenceId, "1", "2", Utils.payload("cc5.bin")));
+            ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
+        } else {
+            ctx.write(new ColumnCount(++sequenceId, 1));
+            ctx.write(
+                    ColumnDefinition.builder()
+                            .sequenceId(++sequenceId)
+                            .catalog("catalog")
+                            .schema("schema")
+                            .table("table")
+                            .orgTable("org_table")
+                            .name("error")
+                            .orgName("org_name")
+                            .columnLength(10)
+                            .type(ColumnType.MYSQL_TYPE_VAR_STRING)
+                            .addFlags(ColumnFlag.NUM)
+                            .decimals(5)
+                            .build());
+            ctx.write(new EOFResponse(++sequenceId, 0));
             ctx.writeAndFlush(new EOFResponse(++sequenceId, 0));
         }
     }
