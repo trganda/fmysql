@@ -1,5 +1,8 @@
 package com.github.trganda.handler;
 
+import static com.github.trganda.codec.constants.Constants.DEFAULT_AUTH_PLUGIN_NAME;
+import static com.github.trganda.handler.Constants.VERSION;
+
 import com.github.trganda.codec.auths.Handshake;
 import com.github.trganda.codec.auths.HandshakeResponse;
 import com.github.trganda.codec.constants.*;
@@ -9,8 +12,10 @@ import com.github.trganda.codec.decoder.MySQLClientFilePacketDecoder;
 import com.github.trganda.codec.packets.*;
 import com.github.trganda.engine.SQLEngine;
 import com.github.trganda.utils.Utils;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +27,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.trganda.codec.constants.Constants.DEFAULT_AUTH_PLUGIN_NAME;
-import static com.github.trganda.handler.Constants.VERSION;
-
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     private static final Pattern SETTINGS_PATTERN = Pattern.compile("@@(\\w+)\\s+AS\\s+(\\w+)");
-    /**
-     * salt for mysql_native_password plugin
-     */
+    /** salt for mysql_native_password plugin */
     private final byte[] salt;
 
     private final SQLEngine sqlEngine;
@@ -47,13 +47,13 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         CapabilityFlags.setCapabilitiesAttr(ctx.channel(), capabilities);
         // sending greeting info of mysql server
         ctx.writeAndFlush(
-            Handshake.builder()
-                .serverVersion(VERSION)
-                .connectionId(1)
-                .addAuthData(salt)
-                .characterSet(MySQLCharacterSet.UTF8_BIN)
-                .addCapabilities(capabilities)
-                .build());
+                Handshake.builder()
+                        .serverVersion(VERSION)
+                        .connectionId(1)
+                        .addAuthData(salt)
+                        .characterSet(MySQLCharacterSet.UTF8_BIN)
+                        .addCapabilities(capabilities)
+                        .build());
     }
 
     @Override
@@ -84,16 +84,16 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                     ctx.flush();
                     ctx.close();
                 } else if (command.equals(Command.COM_INIT_DB)
-                    || command.equals(Command.COM_PING)) {
+                        || command.equals(Command.COM_PING)) {
                     ctx.writeAndFlush(OkResponse.builder().sequenceId(sequenceId + 1).build());
                 } else if (command.equals(Command.COM_FIELD_LIST)) {
                     ctx.writeAndFlush(new EOFResponse(sequenceId + 1, 0));
                 } else if (command.equals(Command.COM_STATISTICS)) {
                     String statString =
-                        "Uptime: "
-                            + Utils.getJVMUptime()
-                            + "  "
-                            + "Hack Code: ..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o";
+                            "Uptime: "
+                                    + Utils.getJVMUptime()
+                                    + "  "
+                                    + "Hack Code: ..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o..oo.o....oo....o.ooo..o.oo.....o.o..o.ooo..oooo...o...o";
                     ctx.writeAndFlush(new StatisticsResponse(sequenceId + 1, statString));
                 }
             }
@@ -108,54 +108,36 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         if (isServerSettingsQuery(queryString)) {
             sendSettingsResponse(ctx, query);
         } else if (queryString
-            .replaceAll("/\\*.*\\*/", "")
-            .toLowerCase()
-            .trim()
-            .startsWith("set ")) {
+                .replaceAll("/\\*.*\\*/", "")
+                .toLowerCase()
+                .trim()
+                .startsWith("set ")) {
             // ignore SET command
             ctx.writeAndFlush(OkResponse.builder().sequenceId(++sequenceId).build());
         } else if (isLoadLocalInFile(queryString)) {
             ctx.writeAndFlush(
-                LoadInFileResponse.builder()
-                    .sequenceId(++sequenceId)
-                    .flag()
-                    .filename("/etc/passwd")
-                    .build());
+                    LoadInFileResponse.builder()
+                            .sequenceId(++sequenceId)
+                            .flag()
+                            .filename("/etc/passwd")
+                            .build());
             ctx.pipeline()
-                .replace("commandDecoder", "fileDecoder", new MySQLClientFilePacketDecoder());
+                    .replace("commandDecoder", "fileDecoder", new MySQLClientFilePacketDecoder());
         } else {
-            final List<ColumnDefinition> columnDefinitions = new ArrayList<>();
-            columnDefinitions.add(
-                ColumnDefinition.builder()
-                    .sequenceId(++sequenceId)
-                    .catalog("def")
-                    .schema("schema")
-                    .table("session_status")
-                    .orgTable("session_status")
-                    .name("Variable_name")
-                    .orgName("Variable_name")
-                    .columnLength(65 * 1024)
-                    .characterSet(MySQLCharacterSet.BINARY)
-                    .type(ColumnType.MYSQL_TYPE_BIT)
-                    .addFlags(ColumnFlag.BLOB)
-                    .decimals(0x00)
-                    .build());
-            columnDefinitions.add(
-                ColumnDefinition.builder()
-                    .sequenceId(++sequenceId)
-                    .catalog("def")
-                    .schema("schema")
-                    .table("session_status")
-                    .orgTable("session_status")
-                    .name("Value")
-                    .orgName("Value")
-                    .columnLength(63)
-                    .type(ColumnType.MYSQL_TYPE_VAR_STRING)
-                    .addFlags(ColumnFlag.BLOB)
-                    .decimals(0x00)
-                    .build());
-            ctx.write(new ColumnCount(++sequenceId, columnDefinitions.size()));
-            for (ColumnDefinition columnDefinition : columnDefinitions) {
+            ColumnFactory columnFactory =
+                    new ColumnFactory(++sequenceId, "def", "", "session_status");
+            columnFactory.addColumnDefinition(
+                    "Variable_name",
+                    MySQLCharacterSet.BINARY,
+                    ColumnType.MYSQL_TYPE_BIT,
+                    ColumnFlag.BLOB);
+            columnFactory.addColumnDefinition(
+                    "Value",
+                    MySQLCharacterSet.UTF8_GENERAL_CI,
+                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                    ColumnFlag.BLOB);
+            ctx.write(new ColumnCount(++sequenceId, columnFactory.getColumnDefinitions().size()));
+            for (ColumnDefinition columnDefinition : columnFactory.getColumnDefinitions()) {
                 ctx.write(columnDefinition);
             }
             ctx.write(new EOFResponse(++sequenceId, 0));
@@ -178,7 +160,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(new AuthSwitchRequest(++sequenceId, authPluginName, salt));
             response.setAuthPluginName(DEFAULT_AUTH_PLUGIN_NAME);
             MySQLClientConnectionPacketDecoder connPacketDecoder =
-                (MySQLClientConnectionPacketDecoder) ctx.pipeline().get("decoder");
+                    (MySQLClientConnectionPacketDecoder) ctx.pipeline().get("decoder");
             connPacketDecoder.setAuthSwitchStatus(1);
             return;
         }
@@ -189,11 +171,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             sqlEngine.authenticate(response.getDatabase(), response.getUser(), scramble411, salt);
             // suppose we have login to mysql server, checkout the decoder to Command Decoder.
             ctx.pipeline()
-                .replace(
-                    "decoder",
-                    "commandDecoder",
-                    new MySQLClientCommandPacketDecoder(
-                        response.getDatabase(), response.getUser(), scramble411));
+                    .replace(
+                            "decoder",
+                            "commandDecoder",
+                            new MySQLClientCommandPacketDecoder(
+                                    response.getDatabase(), response.getUser(), scramble411));
             ctx.writeAndFlush(OkResponse.builder().build());
         } catch (IOException e) {
             Throwable cause = e.getCause();
@@ -207,7 +189,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 errorCode = 1105;
                 sqlState = "#HY000".getBytes(StandardCharsets.US_ASCII);
             }
-            ctx.writeAndFlush(new ErrorResponse(response.getSequenceId() + 1, errorCode, sqlState, errMsg));
+            ctx.writeAndFlush(
+                    new ErrorResponse(response.getSequenceId() + 1, errorCode, sqlState, errMsg));
         }
     }
 
@@ -219,9 +202,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     private boolean isLoadLocalInFile(String query) {
         query = query.toLowerCase();
         return query.contains("load")
-            && query.contains("data")
-            && query.contains("local")
-            && query.contains("infile");
+                && query.contains("data")
+                && query.contains("local")
+                && query.contains("infile");
     }
 
     private void sendSettingsResponse(ChannelHandlerContext ctx, QueryCommand query) {
@@ -229,11 +212,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         // Fix 'select @@version_comment limit 1'
         // Convert 'select DATABASE(), USER() limit 1' to 'select @@database, @@user limit 1
         String setCommand =
-            query.getQuery()
-                .replace("limit 1", "")
-                .replaceAll("(?i)database\\(\\)", "@@database")
-                .replaceAll("(?i)user\\(\\)", "@@user")
-                .replaceAll("(?i)version\\(\\)", "@@version");
+                query.getQuery()
+                        .replace("limit 1", "")
+                        .replaceAll("(?i)database\\(\\)", "@@database")
+                        .replaceAll("(?i)user\\(\\)", "@@user")
+                        .replaceAll("(?i)version\\(\\)", "@@version");
 
         final Matcher matcher = SETTINGS_PATTERN.matcher(setCommand);
         // Add column count row before column definitions to prevent 'UPDATE not result set'.
@@ -248,37 +231,37 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             String systemVariable = matcher.group(1);
             String fieldName = matcher.group(2) != null ? matcher.group(2) : systemVariable;
             switch (systemVariable) {
-                // DATABASE() function
+                    // DATABASE() function
                 case "database":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    63));
                     values.add(query.getDatabase());
                     break;
-                // USER() function
+                    // USER() function
                 case "user":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    63));
                     values.add(query.getUserName() + "@");
                     break;
-                // VERSION() function
+                    // VERSION() function
                 case "version":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    63));
                     values.add(VERSION);
                     break;
                 case "character_set_client":
@@ -288,207 +271,207 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 case "GLOBAL.character_set_server":
                 case "character_set_database":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            12));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    12));
                     values.add("utf8");
                     break;
                 case "collation_server":
                 case "GLOBAL.collation_server":
                 case "collation_connection":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    63));
                     values.add("utf8_general_ci");
                     break;
                 case "init_connect":
                 case "language":
                 case "version_comment":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            0));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    0));
                     values.add("");
                     break;
                 case "interactive_timeout":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            21));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    21));
                     values.add("28800");
                     break;
                 case "license":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            21));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    21));
                     values.add("ASLv2");
                     break;
                 case "lower_case_table_names":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    63));
                     values.add("2");
                     break;
                 case "max_allowed_packet":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    63));
                     values.add("4194304");
                     break;
                 case "net_buffer_length":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    63));
                     values.add("16384");
                     break;
                 case "net_write_timeout":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    63));
                     values.add("28800");
                     break;
                 case "have_query_cache":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            6));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    6));
                     values.add("NO");
                     break;
                 case "sql_mode":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            6));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    6));
                     values.add("0");
                     break;
                 case "system_time_zone":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            9));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    9));
                     values.add("UTC");
                     break;
                 case "time_zone":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            18));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    18));
                     values.add("SYSTEM");
                     break;
                 case "tx_isolation":
                 case "session.tx_isolation":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_VAR_STRING,
-                            63));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_VAR_STRING,
+                                    63));
                     values.add("REPEATABLE-READ");
                     break;
                 case "wait_timeout":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            12));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    12));
                     values.add("28800");
                     break;
                 case "query_cache_type":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            6));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    6));
                     values.add("0");
                     break;
                 case "query_cache_size":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            6));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    6));
                     values.add("0");
                     break;
                 case "performance_schema":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            6));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    6));
                     values.add("0");
                     break;
                 case "session.auto_increment_increment":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            12));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    12));
                     values.add("1");
                     break;
                 case "auto_increment_increment":
                     columnDefinitions.add(
-                        newColumnDefinition(
-                            ++sequenceId,
-                            fieldName,
-                            systemVariable,
-                            ColumnType.MYSQL_TYPE_LONGLONG,
-                            12));
+                            newColumnDefinition(
+                                    ++sequenceId,
+                                    fieldName,
+                                    systemVariable,
+                                    ColumnType.MYSQL_TYPE_LONGLONG,
+                                    12));
                     values.add("1");
                     break;
                 default:
@@ -506,18 +489,18 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ColumnDefinition newColumnDefinition(
-        int packetSequence, String name, String orgName, ColumnType columnType, int length) {
+            int packetSequence, String name, String orgName, ColumnType columnType, int length) {
         return ColumnDefinition.builder()
-            .catalog("def")
-            .schema("")
-            .table("")
-            .orgTable("")
-            .sequenceId(packetSequence)
-            .name(name)
-            .orgName(orgName)
-            .type(columnType)
-            .columnLength(length)
-            .decimals(0x00)
-            .build();
+                .catalog("def")
+                .schema("")
+                .table("")
+                .orgTable("")
+                .sequenceId(packetSequence)
+                .name(name)
+                .orgName(orgName)
+                .type(columnType)
+                .columnLength(length)
+                .decimals(0x00)
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package com.github.trganda.codec.packets;
 
 import com.github.trganda.codec.MySQLServerPacketVisitor;
 import com.github.trganda.codec.constants.ServerStatusFlag;
+
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Collection;

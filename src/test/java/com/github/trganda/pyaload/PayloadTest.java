@@ -1,12 +1,13 @@
 package com.github.trganda.pyaload;
 
 import com.github.trganda.utils.Utils;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PayloadTest {

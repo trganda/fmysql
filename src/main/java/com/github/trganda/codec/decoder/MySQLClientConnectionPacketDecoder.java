@@ -4,6 +4,7 @@ import com.github.trganda.codec.CodecUtils;
 import com.github.trganda.codec.auths.HandshakeResponse;
 import com.github.trganda.codec.constants.CapabilityFlags;
 import com.github.trganda.codec.constants.MySQLCharacterSet;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;

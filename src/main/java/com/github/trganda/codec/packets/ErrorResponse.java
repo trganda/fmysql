@@ -1,6 +1,7 @@
 package com.github.trganda.codec.packets;
 
 import com.github.trganda.codec.MySQLServerPacketVisitor;
+
 import io.netty.channel.ChannelHandlerContext;
 
 /**

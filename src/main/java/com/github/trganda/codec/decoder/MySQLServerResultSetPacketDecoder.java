@@ -8,6 +8,7 @@ import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.packets.ColumnCount;
 import com.github.trganda.codec.packets.ColumnDefinition;
 import com.github.trganda.codec.packets.ResultSetRow;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

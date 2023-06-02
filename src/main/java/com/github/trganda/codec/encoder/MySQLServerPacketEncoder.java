@@ -7,6 +7,7 @@ import com.github.trganda.codec.constants.Constants;
 import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.constants.ServerStatusFlag;
 import com.github.trganda.codec.packets.*;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -173,6 +174,8 @@ public class MySQLServerPacketEncoder extends AbstractPacketEncoder<MySQLServerP
             } else if (value instanceof byte[]) {
                 CodecUtils.writeLengthEncodedInt(buf, (long) ((byte[]) value).length);
                 buf.writeBytes((byte[]) value);
+            } else {
+                buf.writeByte(CodecUtils.NULL_VALUE);
             }
         }
     }

@@ -52,6 +52,43 @@ public enum ColumnType {
         return null;
     }
 
+    public static int getTypeMaxLength(ColumnType type) {
+        switch (type) {
+            case MYSQL_TYPE_TINY:
+                return 0x3;
+            case MYSQL_TYPE_SHORT:
+                return 0x5;
+            case MYSQL_TYPE_LONG:
+            case MYSQL_TYPE_TIME:
+                return 0x8;
+            case MYSQL_TYPE_FLOAT:
+                return 0x20;
+            case MYSQL_TYPE_DOUBLE:
+                return 0x40;
+            case MYSQL_TYPE_NULL:
+                return 0x1;
+            case MYSQL_TYPE_TIMESTAMP:
+                return 0x1F;
+            case MYSQL_TYPE_LONGLONG:
+                return 0x15;
+            case MYSQL_TYPE_INT24:
+                return 0x7;
+            case MYSQL_TYPE_DATE:
+                return 0xA;
+            case MYSQL_TYPE_DATETIME:
+                return 0xF;
+            case MYSQL_TYPE_YEAR:
+                return 0x4;
+            case MYSQL_TYPE_NEWDATE:
+            case MYSQL_TYPE_VARCHAR:
+                return 0xFF;
+            case MYSQL_TYPE_VAR_STRING:
+                return 0x10000;
+            default:
+                return Integer.MAX_VALUE;
+        }
+    }
+
     public int getValue() {
         return value;
     }

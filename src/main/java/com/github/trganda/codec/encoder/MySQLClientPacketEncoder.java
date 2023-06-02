@@ -7,6 +7,7 @@ import com.github.trganda.codec.constants.MySQLCharacterSet;
 import com.github.trganda.codec.packets.CommandPacket;
 import com.github.trganda.codec.packets.MySQLClientPacket;
 import com.github.trganda.codec.packets.QueryCommand;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 

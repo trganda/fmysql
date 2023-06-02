@@ -11,7 +11,7 @@ import java.util.Set;
 
 public final class CodecUtils {
 
-    static final int NULL_VALUE = 0xfb;
+    public static final int NULL_VALUE = 0xfb;
     static final int SHORT_VALUE = 0xfc;
     static final int MEDIUM_VALUE = 0xfd;
     static final int LONG_VALUE = 0xfe;
