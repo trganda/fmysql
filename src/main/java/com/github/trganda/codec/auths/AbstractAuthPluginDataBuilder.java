@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 abstract class AbstractAuthPluginDataBuilder<B extends AbstractAuthPluginDataBuilder>
-    extends AbstractCapabilitiesBuilder<B> {
+        extends AbstractCapabilitiesBuilder<B> {
     protected final ByteBuf authPluginData = Unpooled.buffer();
 
     public B addAuthData(byte[] bytes) {

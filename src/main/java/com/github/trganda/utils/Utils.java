@@ -46,9 +46,9 @@ public final class Utils {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] =
-                (byte)
-                    ((Character.digit(s.charAt(i), 16) << 4)
-                        + Character.digit(s.charAt(i + 1), 16));
+                    (byte)
+                            ((Character.digit(s.charAt(i), 16) << 4)
+                                    + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
@@ -56,7 +56,7 @@ public final class Utils {
     public static boolean compareDigest(String a, String b) {
         if (a == null || b == null) return false;
         return MessageDigest.isEqual(
-            a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
+                a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String scramble411(String passwordSha1Hex, byte[] seedAsBytes) {
@@ -87,7 +87,7 @@ public final class Utils {
     }
 
     public static byte[] payload(String name) {
-        try (InputStream fis = Utils.class.getClassLoader().getResourceAsStream(name);) {
+        try (InputStream fis = Utils.class.getClassLoader().getResourceAsStream(name); ) {
             assert fis != null;
             byte[] bytes = new byte[fis.available()];
             int cnt = fis.read(bytes);

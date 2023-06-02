@@ -24,8 +24,6 @@ public interface ResultSetWriter {
      */
     void writeRow(List<String> row);
 
-    /**
-     * Finish the response
-     */
+    /** Finish the response */
     void finish();
 }

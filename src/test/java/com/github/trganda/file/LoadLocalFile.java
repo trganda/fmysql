@@ -32,16 +32,16 @@ public class LoadLocalFile {
         // Raise a connection to the servers
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection conn =
-                 DriverManager.getConnection(
-                     "jdbc:mysql://localhost:"
-                         + server.getPort()
-                         + "/test?allowUrlInLocalInfile=true&allowLoadLocalInfile=true",
-                     server.getUser(),
-                     server.getPassword())) {
+                DriverManager.getConnection(
+                        "jdbc:mysql://localhost:"
+                                + server.getPort()
+                                + "/test?allowUrlInLocalInfile=true&allowLoadLocalInfile=true",
+                        server.getUser(),
+                        server.getPassword())) {
             Statement stmt = conn.createStatement();
             int rowsAffected =
-                stmt.executeUpdate(
-                    "load data local infile \"/etc\" into table fool FIELDS TERMINATED BY '\\n'");
+                    stmt.executeUpdate(
+                            "load data local infile \"/etc\" into table fool FIELDS TERMINATED BY '\\n'");
             System.out.println(rowsAffected + " row(s) affected.");
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery("SELECT 1");

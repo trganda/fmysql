@@ -30,9 +30,9 @@ public class Handshake extends DefaultByteBufHolder implements MySQLServerPacket
         super(builder.authPluginData);
         if (builder.authPluginData.readableBytes() < Constants.AUTH_PLUGIN_DATA_PART1_LEN) {
             throw new IllegalArgumentException(
-                "authPluginData can not contain less than "
-                    + Constants.AUTH_PLUGIN_DATA_PART1_LEN
-                    + " bytes.");
+                    "authPluginData can not contain less than "
+                            + Constants.AUTH_PLUGIN_DATA_PART1_LEN
+                            + " bytes.");
         }
 
         //		System.out.println(">>>" + builder.authPluginData.readableBytes() + " " +
@@ -98,25 +98,25 @@ public class Handshake extends DefaultByteBufHolder implements MySQLServerPacket
         if (!super.equals(o)) return false;
         final Handshake handshake = (Handshake) o;
         return protocolVersion == handshake.protocolVersion
-            && connectionId == handshake.connectionId
-            && Objects.equals(serverVersion, handshake.serverVersion)
-            && Objects.equals(capabilities, handshake.capabilities)
-            && characterSet == handshake.characterSet
-            && Objects.equals(serverStatus, handshake.serverStatus)
-            && Objects.equals(authPluginName, handshake.authPluginName);
+                && connectionId == handshake.connectionId
+                && Objects.equals(serverVersion, handshake.serverVersion)
+                && Objects.equals(capabilities, handshake.capabilities)
+                && characterSet == handshake.characterSet
+                && Objects.equals(serverStatus, handshake.serverStatus)
+                && Objects.equals(authPluginName, handshake.authPluginName);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(),
-            protocolVersion,
-            serverVersion,
-            connectionId,
-            capabilities,
-            characterSet,
-            serverStatus,
-            authPluginName);
+                super.hashCode(),
+                protocolVersion,
+                serverVersion,
+                connectionId,
+                capabilities,
+                characterSet,
+                serverStatus,
+                authPluginName);
     }
 
     public static class Builder extends AbstractAuthPluginDataBuilder<Builder> {
@@ -149,7 +149,7 @@ public class Handshake extends DefaultByteBufHolder implements MySQLServerPacket
         }
 
         public Builder addServerStatus(
-            ServerStatusFlag serverStatus, ServerStatusFlag... serverStatuses) {
+                ServerStatusFlag serverStatus, ServerStatusFlag... serverStatuses) {
             this.serverStatus.add(serverStatus);
             Collections.addAll(this.serverStatus, serverStatuses);
             return this;

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
-    implements MySQLClientPacketDecoder {
+        implements MySQLClientPacketDecoder {
 
     private String database;
     private String userName;
@@ -34,7 +34,7 @@ public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
     }
 
     public MySQLClientCommandPacketDecoder(
-        int maxPacketSize, String database, String userName, byte[] scramble411) {
+            int maxPacketSize, String database, String userName, byte[] scramble411) {
         super(maxPacketSize);
 
         this.database = database;
@@ -44,9 +44,9 @@ public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
 
     @Override
     protected void decodePayload(
-        ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
+            ChannelHandlerContext ctx, int sequenceId, ByteBuf packet, List<Object> out) {
         final MySQLCharacterSet clientCharset =
-            MySQLCharacterSet.getClientCharsetAttr(ctx.channel());
+                MySQLCharacterSet.getClientCharsetAttr(ctx.channel());
 
         final byte commandCode = packet.readByte();
         final Optional<Command> command = Command.findByCommandCode(commandCode);
@@ -54,16 +54,16 @@ public class MySQLClientCommandPacketDecoder extends AbstractPacketDecoder
             throw new DecoderException("Unknown command " + commandCode);
         }
         switch (command.get()) {
-            // currently only support COM_QUERY
+                // currently only support COM_QUERY
             case COM_QUERY:
                 out.add(
-                    new QueryCommand(
-                        sequenceId,
-                        CodecUtils.readFixedLengthString(
-                            packet, packet.readableBytes(), clientCharset.getCharset()),
-                        database,
-                        userName,
-                        scramble411));
+                        new QueryCommand(
+                                sequenceId,
+                                CodecUtils.readFixedLengthString(
+                                        packet, packet.readableBytes(), clientCharset.getCharset()),
+                                database,
+                                userName,
+                                scramble411));
                 break;
             default:
                 out.add(new CommandPacket(sequenceId, command.get()));

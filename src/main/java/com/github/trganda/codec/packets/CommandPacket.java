@@ -2,9 +2,7 @@ package com.github.trganda.codec.packets;
 
 import com.github.trganda.codec.constants.Command;
 
-/**
- *
- */
+/** */
 public class CommandPacket extends AbstractMySQLPacket implements MySQLClientPacket {
 
     private final Command command;

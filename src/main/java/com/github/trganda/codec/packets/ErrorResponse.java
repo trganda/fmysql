@@ -4,9 +4,7 @@ import com.github.trganda.codec.MySQLServerPacketVisitor;
 
 import io.netty.channel.ChannelHandlerContext;
 
-/**
- * This packet indicates that an error occurred.
- */
+/** This packet indicates that an error occurred. */
 public class ErrorResponse extends AbstractMySQLPacket implements MySQLServerPacket {
 
     private final int errorNumber;

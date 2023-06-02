@@ -43,7 +43,7 @@ public final class CodecUtils {
             final long length = buf.readLongLE();
             if (length < 0) {
                 throw new CodecException(
-                    "Received a length value too large to handle: " + Long.toHexString(length));
+                        "Received a length value too large to handle: " + Long.toHexString(length));
             }
             return length;
         }
@@ -146,7 +146,7 @@ public final class CodecUtils {
         for (E e : set) {
             if (e.ordinal() >= Long.SIZE) {
                 throw new IllegalArgumentException(
-                    "The enum set is too large to fit in a bit vector: " + set);
+                        "The enum set is too large to fit in a bit vector: " + set);
             }
             vector |= 1L << e.ordinal();
         }
@@ -171,7 +171,7 @@ public final class CodecUtils {
 
         if (length > 7 || length < 5) {
             throw new IllegalArgumentException(
-                "length in readUnsignedLongLE should be between 5 and 7");
+                    "length in readUnsignedLongLE should be between 5 and 7");
         }
 
         for (int i = 0; i < length; ++i) {
@@ -200,7 +200,7 @@ public final class CodecUtils {
     }
 
     public static void writeLengthEncodedString(
-        ByteBuf buf, CharSequence sequence, Charset charset) {
+            ByteBuf buf, CharSequence sequence, Charset charset) {
         final ByteBuf tmpBuf = Unpooled.buffer();
         try {
             // Support null value.
@@ -218,7 +218,7 @@ public final class CodecUtils {
     }
 
     public static void writeNullTerminatedString(
-        ByteBuf buf, CharSequence sequence, Charset charset) {
+            ByteBuf buf, CharSequence sequence, Charset charset) {
         if (sequence != null) {
             buf.writeCharSequence(sequence, charset);
         }

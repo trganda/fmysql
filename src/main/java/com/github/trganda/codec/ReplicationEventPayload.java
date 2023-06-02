@@ -1,4 +1,3 @@
 package com.github.trganda.codec;
 
-public interface ReplicationEventPayload {
-}
+public interface ReplicationEventPayload {}

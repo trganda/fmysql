@@ -1,8 +1,6 @@
 package com.github.trganda.codec.packets;
 
-/**
- * AbstractMySQLPacket
- */
+/** AbstractMySQLPacket */
 abstract class AbstractMySQLPacket implements MySQLPacket {
 
     protected final int sequenceId;

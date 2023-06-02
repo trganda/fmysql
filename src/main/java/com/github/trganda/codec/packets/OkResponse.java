@@ -89,7 +89,7 @@ public class OkResponse extends AbstractMySQLPacket implements MySQLServerPacket
         }
 
         public Builder addStatusFlags(
-            ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
+                ServerStatusFlag statusFlag, ServerStatusFlag... statusFlags) {
             this.statusFlags.add(statusFlag);
             Collections.addAll(this.statusFlags, statusFlags);
             return this;

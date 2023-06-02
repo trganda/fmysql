@@ -30,27 +30,27 @@ public class FakeServer implements AutoCloseable {
         parentGroup = new NioEventLoopGroup();
         childGroup = new NioEventLoopGroup();
         final ChannelFuture channelFuture =
-            new ServerBootstrap()
-                .group(parentGroup, childGroup)
-                .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(
-                    new ChannelInitializer<NioSocketChannel>() {
-                        @Override
-                        protected void initChannel(NioSocketChannel ch)
-                            throws Exception {
-                            final ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast("encoder", new MySQLServerPacketEncoder());
-                            pipeline.addLast(
-                                "decoder",
-                                new MySQLClientConnectionPacketDecoder());
-                            pipeline.addLast(
-                                "handler",
-                                new ServerHandler(
-                                    new NormalSQLEngine(user, password)));
-                        }
-                    })
-                .bind(port);
+                new ServerBootstrap()
+                        .group(parentGroup, childGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .handler(new LoggingHandler(LogLevel.INFO))
+                        .childHandler(
+                                new ChannelInitializer<NioSocketChannel>() {
+                                    @Override
+                                    protected void initChannel(NioSocketChannel ch)
+                                            throws Exception {
+                                        final ChannelPipeline pipeline = ch.pipeline();
+                                        pipeline.addLast("encoder", new MySQLServerPacketEncoder());
+                                        pipeline.addLast(
+                                                "decoder",
+                                                new MySQLClientConnectionPacketDecoder());
+                                        pipeline.addLast(
+                                                "handler",
+                                                new ServerHandler(
+                                                        new NormalSQLEngine(user, password)));
+                                    }
+                                })
+                        .bind(port);
         channel = channelFuture.channel();
         channelFuture.awaitUninterruptibly();
     }

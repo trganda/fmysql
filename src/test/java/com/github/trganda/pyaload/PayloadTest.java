@@ -18,17 +18,17 @@ public class PayloadTest {
         System.out.println(len);
         System.out.println(Arrays.toString(bytes));
 
-        char[] chars = new char[len/2 + 1];
+        char[] chars = new char[len / 2 + 1];
         for (int i = 0; i < (len / 2); i++) {
-            chars[i] = byteToChar(bytes[i], bytes[i+1]);
+            chars[i] = byteToChar(bytes[i], bytes[i + 1]);
         }
 
         char[] temp = new char[0];
         if (len % 2 == 0) {
-            temp = Arrays.copyOfRange(chars, 0, len/2);
+            temp = Arrays.copyOfRange(chars, 0, len / 2);
         } else {
             int last = len / 2;
-            chars[last] = (char) (0xFF00 | ((bytes[len-1] & 0xFF) << 8));
+            chars[last] = (char) (0xFF00 | ((bytes[len - 1] & 0xFF) << 8));
             temp = chars;
         }
         System.out.println(Arrays.toString(temp));

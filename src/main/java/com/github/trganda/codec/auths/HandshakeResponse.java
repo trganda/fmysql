@@ -37,12 +37,12 @@ public class HandshakeResponse extends DefaultByteBufHolder implements MySQLClie
     }
 
     public static HandshakeResponse createSslResponse(
-        Set<CapabilityFlags> capabilities, int maxPacketSize, MySQLCharacterSet characterSet) {
+            Set<CapabilityFlags> capabilities, int maxPacketSize, MySQLCharacterSet characterSet) {
         return create().maxPacketSize(maxPacketSize)
-            .characterSet(characterSet)
-            .addCapabilities(capabilities)
-            .addCapabilities(CapabilityFlags.CLIENT_SSL)
-            .build();
+                .characterSet(characterSet)
+                .addCapabilities(capabilities)
+                .addCapabilities(CapabilityFlags.CLIENT_SSL)
+                .build();
     }
 
     public ByteBuf getAuthPluginData() {
