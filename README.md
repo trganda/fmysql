@@ -73,7 +73,7 @@ MySQL 支持 `load data local infile` 语句读取文件发送至服务端。
 load data local infile "/etc/passwd" into table foo FIELDS TERMINATED BY '\n';
 ```
 
-通信流程如下，可以通过伪造响应内容，让客户端读取任意文件
+通信流程如下，可以通过伪造响应内容 `0xFB + 需要读取的文件路径`，让客户端读取任意文件
 
 <img width="438" alt="image" src="https://github.com/trganda/fmysql/assets/62204882/c8c5500f-a731-4640-b85e-e1147fe354d6">
 
