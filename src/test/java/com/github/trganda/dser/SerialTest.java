@@ -42,7 +42,6 @@ public class SerialTest {
     public void serialTest5128() throws ClassNotFoundException, SQLException {
         String driver = "com.mysql.jdbc.Driver";
         String DB_URL = "jdbc:mysql://127.0.0.1:" + port + "/test?autoDeserialize=true";
-        Class.forName(driver);
         Connection conn =
                 DriverManager.getConnection(DB_URL, server.getUser(), server.getPassword());
     }
