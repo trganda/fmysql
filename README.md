@@ -1,6 +1,6 @@
 # fmysql
 
-一个基于 [netty-mysql-codec](https://github.com/mheath/netty-mysql-codec) 开发的恶意 MySQL 服务器。出于学习 [https://i.blackhat.com/eu-19/Thursday/eu-19-Zhang-New-Exploit-Technique-In-Java-Deserialization-Attack.pdf](https://i.blackhat.com/eu-19/Thursday/eu-19-Zhang-New-Exploit-Technique-In-Java-Deserialization-Attack.pdf)，的内容而编写。
+一个基于 [netty-mysql-codec](https://github.com/mheath/netty-mysql-codec) 开发的恶意 MySQL 服务器。出于学习 [https://i.blackhat.com/eu-19/Thursday/eu-19-Zhang-New-Exploit-Technique-In-Java-Deserialization-Attack.pdf](https://i.blackhat.com/eu-19/Thursday/eu-19-Zhang-New-Exploit-Technique-In-Java-Deserialization-Attack.pdf) 的内容而编写。
 
 
 > 在 JDBC URL 可控的条件下攻击 MySQL JDBC Driver。
